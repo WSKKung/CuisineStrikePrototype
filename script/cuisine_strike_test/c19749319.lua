@@ -1,4 +1,6 @@
--- the sun's upside
+---@version 5.3
+---@module "edopro_typehint_helper"
+---the sun's upside
 
 local s, id = GetID()
 
@@ -8,10 +10,10 @@ local min_power_destroy_target = 400
 
 function s.initial_effect(c)
 
-	cs.InitializeDishEffects(c)
+	CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedure
-	Fusion.AddProcMixN(c, true, true, cs.CARD_METEGGOR, 2)
+	Fusion.AddProcMixN(c, true, true, CuisineStrike.CARD_METEGGOR, 2)
 
 	-- destroy
 	local e1 = Effect.CreateEffect(c)
@@ -42,5 +44,5 @@ function s.initial_effect(c)
 end
 
 function s.filter(c)
-	return cs.IsDishCard(c) and c:IsFaceup() and c:GetAttack() <= min_power_destroy_target
+	return CuisineStrike.IsDishCard(c) and c:IsFaceup() and c:GetAttack() <= min_power_destroy_target
 end

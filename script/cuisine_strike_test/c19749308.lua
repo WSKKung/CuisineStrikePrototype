@@ -1,4 +1,6 @@
--- dragon wheellington
+---@version 5.3
+---@module "edopro_typehint_helper"
+---dragon wheellington
 
 local s, id = GetID()
 
@@ -8,10 +10,10 @@ local heal_multiplier = 100
 
 function s.initial_effect(c)
 
-	cs.InitializeDishEffects(c)
+	CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedures
-	Fusion.AddProcMix(c, true, true, cs.CARD_BUN_GARDNA, aux.FilterBoolFunctionEx(Card.IsRace, cs.CLASS_MEAT))
+	Fusion.AddProcMix(c, true, true, CuisineStrike.CARD_BUN_GARDNA, aux.FilterBoolFunctionEx(Card.IsRace, CuisineStrike.CLASS_MEAT))
 	
 	-- heal
 	local e1 = Effect.CreateEffect(c)
@@ -26,12 +28,12 @@ function s.initial_effect(c)
 	end)
 	
 	e1:SetTarget(function (e, tp, eg, ep, ev, re, r, rp, chk)
-		if chk==0 then return cs.IsAbleToHeal(e:GetHandler()) end
+		if chk==0 then return CuisineStrike.IsAbleToHeal(e:GetHandler()) end
 	end)
 
 	e1:SetOperation(function (e, tp, eg, ep, ev, re, r, rp)
 		local c = e:GetHandler()
-		cs.Heal(c, c:GetLevel() * heal_multiplier)
+		CuisineStrike.Heal(c, c:GetLevel() * heal_multiplier)
 	end)
 
 	c:RegisterEffect(e1)

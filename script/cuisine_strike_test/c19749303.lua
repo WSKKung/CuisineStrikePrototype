@@ -1,4 +1,6 @@
--- cowvern
+---@version 5.3
+---@module "edopro_typehint_helper"
+---cowvern
 
 local s, id = GetID()
 
@@ -7,7 +9,7 @@ Duel.LoadScript("cuisine_strike_common.lua")
 local power_boost_amount = 100
 
 function s.initial_effect(c)
-	cs.InitializeIngredientEffects(c, {grade=2})
+	CuisineStrike.InitializeIngredientEffects(c)
 
 	local power_boost_e = Effect.CreateEffect(c)
 	power_boost_e:SetType(EFFECT_TYPE_FIELD)

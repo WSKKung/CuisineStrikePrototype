@@ -1,4 +1,6 @@
--- meteggor
+---@version 5.3
+---@module "edopro_typehint_helper"
+---meteggor
 
 local s, id = GetID()
 
@@ -7,7 +9,7 @@ Duel.LoadScript("cuisine_strike_common.lua")
 local damage_amount = 300
 
 function s.initial_effect(c)
-	cs.InitializeIngredientEffects(c, {grade=2})
+	CuisineStrike.InitializeIngredientEffects(c)
 
 	local e1 = Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DEFCHANGE)
@@ -33,7 +35,7 @@ function s.initial_effect(c)
 		local tg = Duel.GetMatchingGroup(s.filter, tp, 0, LOCATION_MZONE, nil)
 		if #tg > 0 then
 			tg:ForEach(function (tc)
-				cs.Damage(tc, damage_amount)
+				CuisineStrike.Damage(tc, damage_amount)
 			end)
 		end
 	end)
@@ -42,5 +44,5 @@ function s.initial_effect(c)
 end
 
 function s.filter(c)
-	return cs.IsDishCard(c) and c:IsFaceup()
+	return CuisineStrike.IsDishCard(c) and c:IsFaceup()
 end

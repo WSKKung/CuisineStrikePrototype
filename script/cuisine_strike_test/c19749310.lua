@@ -1,4 +1,6 @@
--- bacon saber sandwitch
+---@version 5.3
+---@module "edopro_typehint_helper"
+---bacon saber sandwitch
 
 local s, id = GetID()
 
@@ -8,10 +10,10 @@ local power_boost_multiplier = 100
 
 function s.initial_effect(c)
 
-	cs.InitializeDishEffects(c)
+	CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedures
-	Fusion.AddProcMix(c, true, true, cs.CARD_PIG_FAIRY, aux.FilterBoolFunctionEx(Card.IsRace, cs.CLASS_BREAD))
+	Fusion.AddProcMix(c, true, true, CuisineStrike.CARD_PIG_FAIRY, aux.FilterBoolFunctionEx(Card.IsRace, CuisineStrike.CLASS_BREAD))
 
 	-- give power to a dish
 	local e1 = Effect.CreateEffect(c)

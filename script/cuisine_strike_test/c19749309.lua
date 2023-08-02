@@ -1,4 +1,6 @@
--- bacon saber & egg
+---@version 5.3
+---@module "edopro_typehint_helper"
+---bacon saber & egg
 
 local s, id = GetID()
 
@@ -8,10 +10,10 @@ local power_boost_multiplier = 100
 
 function s.initial_effect(c)
 
-	cs.InitializeDishEffects(c)
+	CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedures
-	Fusion.AddProcMix(c, true, true, cs.CARD_PIG_FAIRY, aux.FilterBoolFunctionEx(Card.IsRace, cs.CLASS_EGG))
+	Fusion.AddProcMix(c, true, true, CuisineStrike.CARD_PIG_FAIRY, aux.FilterBoolFunctionEx(Card.IsRace, CuisineStrike.CLASS_EGG))
 
 	local pow_boost_eff = Effect.CreateEffect(c)
 	pow_boost_eff:SetType(EFFECT_TYPE_FIELD)
@@ -20,7 +22,7 @@ function s.initial_effect(c)
 	pow_boost_eff:SetTargetRange(LOCATION_MZONE, 0)
 	pow_boost_eff:SetTarget(aux.TRUE)
 	pow_boost_eff:SetValue(function (e, c)
-		return cs.GetBonusGrade(e:GetHandler()) * power_boost_multiplier
+		return CuisineStrike.GetBonusGrade(e:GetHandler()) * power_boost_multiplier
 	end)
 	c:RegisterEffect(pow_boost_eff)
 

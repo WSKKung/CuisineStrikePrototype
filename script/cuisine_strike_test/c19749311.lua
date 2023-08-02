@@ -1,4 +1,6 @@
--- fork trap
+---@version 5.3
+---@module "edopro_typehint_helper"
+---fork trap
 
 local s, id = GetID()
 
@@ -8,16 +10,16 @@ local damage_amount = 500
 
 function s.initial_effect(c)
 
-	cs.InitializeActionEffects(c)
+	CuisineStrike.InitializeActionEffects(c)
 
-	local e1 = cs.CreateActionActivationEffect(c, {
+	local e1 = CuisineStrike.CreateActionActivationEffect(c, {
 		condition = function (e, tp, eg, ep, ev, re, r, rp)
 			return Duel.GetAttacker():IsControler(1-tp)
 		end,
 		operation = function (e, tp, eg, ep, ev, re, r, rp)
 			local at = Duel.GetAttacker()
 			if at and at:IsRelateToBattle() then
-				cs.Damage(at, damage_amount)
+				CuisineStrike.Damage(at, damage_amount)
 			end
 		end
 	})

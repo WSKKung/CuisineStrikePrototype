@@ -1,27 +1,29 @@
-cs = {}
+---@version 5.3
+
+CuisineStrike = {}
 
 -- common card ids
-cs.CARD_BUN_GARDNA = 19749301
-cs.CARD_PIG_FAIRY = 19749302
-cs.CARD_COWVERN = 19749303
-cs.CARD_METEGGOR = 19749314
+CuisineStrike.CARD_BUN_GARDNA = 19749301
+CuisineStrike.CARD_PIG_FAIRY = 19749302
+CuisineStrike.CARD_COWVERN = 19749303
+CuisineStrike.CARD_METEGGOR = 19749314
 
 -- common classes (race aliases)
-cs.CLASS_MEAT = RACE_BEAST
-cs.CLASS_BREAD = RACE_ROCK
-cs.CLASS_EGG = RACE_REPTILE
+CuisineStrike.CLASS_MEAT = RACE_BEAST
+CuisineStrike.CLASS_BREAD = RACE_ROCK
+CuisineStrike.CLASS_EGG = RACE_REPTILE
 
 --- 
 --- @param c Card
 --- @return integer 
-function cs.GetBonusGrade(c)
+function CuisineStrike.GetBonusGrade(c)
 	return c:GetLevel() - c:GetOriginalLevel()
 end
 
 --- 
 --- @param c Card
 --- @return boolean 
-function cs.IsAbleToHeal(c)
+function CuisineStrike.IsAbleToHeal(c)
 	return c:GetDefense() < c:GetBaseDefense()
 end
 
@@ -29,29 +31,29 @@ end
 --- 
 --- @param c Card
 --- @return boolean 
-function cs.IsDishCard(c)
+function CuisineStrike.IsDishCard(c)
 	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_FUSION)
 end
 
 --- 
 --- @param c Card
 --- @return boolean 
-function cs.IsIngredientCard(c)
+function CuisineStrike.IsIngredientCard(c)
 	return c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_EXTRA)
 end
 
 --- 
 --- @param c Card
 --- @return boolean 
-function cs.IsActionCard(c)
+function CuisineStrike.IsActionCard(c)
 	return c:IsType(TYPE_TRAP)
 end
 
---- 
+--- Heals a specified card Unit (c Card) with the given amount of Health (int amount)\
 --- @param c Card
 --- @param amount integer
---- @return integer 
-function cs.Heal(c, amount)
+--- @return integer The amount of Health healed
+function CuisineStrike.Heal(c, amount)
 
 	local max_health = c:GetBaseDefense()
 	local cur_health = c:GetDefense()
@@ -74,11 +76,11 @@ function cs.Heal(c, amount)
 	return amount
 end
 
---- 
+--- Deals a damage to a specified card Unit (c Card) with the given amount (int amount)\
 --- @param c Card
 --- @param amount integer
---- @return integer 
-function cs.Damage(c, amount)
+--- @return integer The amount of damage dealt
+function CuisineStrike.Damage(c, amount)
 
 	local cur_health = c:GetDefense()
 
@@ -99,13 +101,11 @@ function cs.Damage(c, amount)
 	return amount
 end
 
---- 
+--- Initialize all effects common to every ingredient cards to the given (c Card)
 --- @param c Card
---- @param props {grade: integer}
-function cs.InitializeIngredientEffects(c, props)
+function CuisineStrike.InitializeIngredientEffects(c)
 
-	local grade = 0
-	if props.grade then grade = props.grade end
+	local grade = c:GetOriginalLevel()
 
 	-- disallow all summons
 	c:EnableUnsummonable()
@@ -148,9 +148,9 @@ function cs.InitializeIngredientEffects(c, props)
 end
 
 
---- 
+--- Initialize all effects common to every dish cards to the given (c Card)
 --- @param c Card
-function cs.InitializeDishEffects(c)
+function CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedure
 	c:EnableReviveLimit()
@@ -205,7 +205,7 @@ function cs.InitializeDishEffects(c)
 	hp_sim_eff:SetOperation(function (e, tp, eg, ep, ev, re, r, rp)
 		local c = e:GetHandler()
 		local damage = e:GetLabel()
-		cs.Damage(c, -damage)
+		CuisineStrike.Damage(c, -damage)
 	end)
 
 	c:RegisterEffect(hp_sim_eff)
@@ -236,10 +236,11 @@ function cs.InitializeDishEffects(c)
 	c:RegisterEffect(no_battle_damage_eff)
 end
 
-
---- 
---- @param c Card
-function cs.InitializeActionEffects(c)
+---Initialize all effects common to every action cards to the given (c Card)\
+---Action card activated effect should be created by using `CuisineStrike.CreateActionActivationEffect` function instead of manually create Effect instance.\
+---@see CuisineStrike.CreateActionActivationEffect
+---@param c Card
+function CuisineStrike.InitializeActionEffects(c)
 
 	local cannot_set_eff=Effect.CreateEffect(c)
 	cannot_set_eff:SetType(EFFECT_TYPE_FIELD)
@@ -262,7 +263,7 @@ end
 --- 
 --- @param c Card
 --- @return Effect
-function cs.CreateShieldEffect(c)
+function CuisineStrike.CreateShieldEffect(c)
 	--- @type Effect
 	local e1 = Effect.CreateEffect(c)
 	--e:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -285,11 +286,11 @@ function cs.CreateShieldEffect(c)
 	return e1
 end
 
---- 
+--- Create activation effect for action card (c Card)
 --- @param c Card
 --- @param params {cost: function, condition: function, target: function, operation: function}
 --- @return Effect
-function cs.CreateActionActivationEffect(c, params)
+function CuisineStrike.CreateActionActivationEffect(c, params)
 	
 	local e1 = Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)

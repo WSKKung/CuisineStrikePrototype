@@ -1,4 +1,6 @@
--- plate return
+---@version 5.3
+---@module "edopro_typehint_helper"
+---plate return
 
 local s, id = GetID()
 
@@ -6,9 +8,9 @@ Duel.LoadScript("cuisine_strike_common.lua")
 
 function s.initial_effect(c)
 
-	cs.InitializeActionEffects(c)
+	CuisineStrike.InitializeActionEffects(c)
 
-	local e1 = cs.CreateActionActivationEffect(c, {
+	local e1 = CuisineStrike.CreateActionActivationEffect(c, {
 		condition = function (e, tp, eg, ep, ev, re, r, rp)
 			return eg and eg:IsExists(s.destroyed_card_filter, 1, nil, tp)
 		end,
@@ -34,9 +36,9 @@ function s.initial_effect(c)
 end
 
 function s.destroyed_card_filter(c, tp)
-	return cs.IsDishCard(c) and c:IsControler(tp)
+	return CuisineStrike.IsDishCard(c) and c:IsControler(tp)
 end
 
 function s.ingredient_set_filter(c, tp, race)
-	return cs.IsIngredientCard(c) and c:GetLevel() <= 2 and c:IsControler(tp) and c:IsRace(race)
+	return CuisineStrike.IsIngredientCard(c) and c:GetLevel() <= 2 and c:IsControler(tp) and c:IsRace(race)
 end

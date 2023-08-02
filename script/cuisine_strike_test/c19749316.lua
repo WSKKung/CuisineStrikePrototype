@@ -1,11 +1,13 @@
--- moon bun bun
+---@version 5.3
+---@module "edopro_typehint_helper"
+---moon bun bun
 
 local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
 function s.initial_effect(c)
-	cs.InitializeIngredientEffects(c, {grade=1})
+	CuisineStrike.InitializeIngredientEffects(c)
 	
 	-- recycle & grade up ingredient
 	local e1 = Effect.CreateEffect(c)
@@ -45,5 +47,5 @@ function s.initial_effect(c)
 end
 
 function s.filter(c)
-	return cs.IsIngredientCard(c) and c:IsRace(cs.CLASS_BREAD) and c:GetLevel() <= 2
+	return CuisineStrike.IsIngredientCard(c) and c:IsRace(CuisineStrike.CLASS_BREAD) and c:GetLevel() <= 2
 end

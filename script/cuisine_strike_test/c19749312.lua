@@ -1,4 +1,6 @@
--- mold invasion
+---@version 5.3
+---@module "edopro_typehint_helper"
+---mold invasion
 
 local s, id = GetID()
 
@@ -8,9 +10,9 @@ local grade_reduc_amount = 1
 
 function s.initial_effect(c)
 
-	cs.InitializeActionEffects(c)
+	CuisineStrike.InitializeActionEffects(c)
 
-	local e1 = cs.CreateActionActivationEffect(c, {
+	local e1 = CuisineStrike.CreateActionActivationEffect(c, {
 		condition = function (e, tp, eg, ep, ev, re, r, rp)
 			return eg and eg:IsExists(s.ingredient_set_filter, 1, nil, tp)
 		end,
@@ -48,5 +50,5 @@ function s.initial_effect(c)
 end
 
 function s.ingredient_set_filter(c, tp)
-	return c:IsFaceup() and cs.IsIngredientCard(c) and c:IsPreviousLocation(LOCATION_HAND) and c:IsLocation(LOCATION_SZONE) and c:IsControler(1-tp) and c:GetSequence() < 5
+	return c:IsFaceup() and CuisineStrike.IsIngredientCard(c) and c:IsPreviousLocation(LOCATION_HAND) and c:IsLocation(LOCATION_SZONE) and c:IsControler(1-tp) and c:GetSequence() < 5
 end

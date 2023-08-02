@@ -1,4 +1,6 @@
--- rib-eyes steak dragon
+---@version 5.3
+---@module "edopro_typehint_helper"
+---rib-eyes steak dragon
 
 local s, id = GetID()
 
@@ -8,10 +10,10 @@ local aoe_damage_amount = 200
 
 function s.initial_effect(c)
 
-	cs.InitializeDishEffects(c)
+	CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedure
-	Fusion.AddProcMixN(c, true, true, cs.CARD_COWVERN, 2)
+	Fusion.AddProcMixN(c, true, true, CuisineStrike.CARD_COWVERN, 2)
 
 	-- damage all
 	local e1 = Effect.CreateEffect(c)
@@ -33,7 +35,7 @@ function s.initial_effect(c)
 		local g = Duel.GetMatchingGroup(s.filter, tp, 0, LOCATION_MZONE, nil)
 		if #g > 0 then
 			g:ForEach(function (tc)
-				cs.Damage(tc, aoe_damage_amount)
+				CuisineStrike.Damage(tc, aoe_damage_amount)
 			end)
 		end
 	end)

@@ -1,4 +1,6 @@
--- steak startare
+---@version 5.3
+---@module "edopro_typehint_helper"
+---steak startare
 
 local s, id = GetID()
 
@@ -8,10 +10,10 @@ local damage_multiplier = 100
 
 function s.initial_effect(c)
 
-	cs.InitializeDishEffects(c)
+	CuisineStrike.InitializeDishEffects(c)
 
 	-- cook summon procedure
-	Fusion.AddProcMix(c, true, true, cs.CARD_METEGGOR, aux.FilterBoolFunctionEx(Card.IsRace, cs.CLASS_MEAT))
+	Fusion.AddProcMix(c, true, true, CuisineStrike.CARD_METEGGOR, aux.FilterBoolFunctionEx(Card.IsRace, CuisineStrike.CLASS_MEAT))
 
 	-- damage all
 	local e1 = Effect.CreateEffect(c)
@@ -29,7 +31,7 @@ function s.initial_effect(c)
 		local g = Duel.SelectMatchingCard(tp, s.filter, tp, 0, LOCATION_MZONE, 1, 1, nil)
 		if #g > 0 then
 			local tc = g:GetFirst()
-			cs.Damage(tc, c:GetLevel() * damage_multiplier)
+			CuisineStrike.Damage(tc, c:GetLevel() * damage_multiplier)
 			
 			local no_attack_e = Effect.CreateEffect(c)
 			no_attack_e:SetType(EFFECT_TYPE_SINGLE)
