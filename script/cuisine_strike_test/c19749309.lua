@@ -24,4 +24,5 @@ function s.initial_effect(c)
 	end)
 	c:RegisterEffect(pow_boost_eff)
 
+
 end

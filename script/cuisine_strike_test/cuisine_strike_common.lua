@@ -13,7 +13,6 @@ cs.CLASS_EGG = RACE_REPTILE
 
 --- 
 --- @param c Card
---- @param amount integer
 --- @return integer 
 function cs.GetBonusGrade(c)
 	return c:GetLevel() - c:GetOriginalLevel()
@@ -21,7 +20,6 @@ end
 
 --- 
 --- @param c Card
---- @param amount integer
 --- @return boolean 
 function cs.IsAbleToHeal(c)
 	return c:GetDefense() < c:GetBaseDefense()
@@ -103,12 +101,11 @@ end
 
 --- 
 --- @param c Card
---- @param grade integer
 --- @param props {grade: integer}
 function cs.InitializeIngredientEffects(c, props)
 
 	local grade = 0
-	if props["grade"] ~= nil then grade = props["grade"] end
+	if props.grade then grade = props.grade end
 
 	-- disallow all summons
 	c:EnableUnsummonable()
@@ -134,7 +131,7 @@ function cs.InitializeIngredientEffects(c, props)
 		if chk==0 then return cost_check(e, tp) end
 		if grade > 1 then
 			Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TOGRAVE)
-			local g = Duel.SelectMatchingCard(tp, cost_filter, tp, LOCATION_SZONE, 0, 1, 1, nil):GetFirst()
+			local g = Duel.SelectMatchingCard(tp, cost_filter, tp, LOCATION_SZONE, 0, 1, 1, nil)
 			Duel.SendtoGrave(g, REASON_COST)
 		end
 	end)
@@ -155,35 +152,33 @@ end
 --- @param c Card
 function cs.InitializeDishEffects(c)
 
-	local function special_summon_limit(e, se, sp, st)
-		return (st & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION
-	end
-	
-	local function cook_summon_condition(tp)
-		return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost, tp, LOCATION_SZONE, 0, nil)
-	end
-	
-	--- @param g Group
-	--- @param tp integer
-	--- @param c Card
-	local function cook_summon_operation(g, tp, c)
-
-		local sumlvl = g:GetSum(Card.GetLevel)
-
-		-- mix ingredients grade and apply to summoned dish as new grade
-		local e1 = Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_LEVEL)
-		e1:SetValue(sumlvl)
-		c:RegisterEffect(e1)
-
-		Duel.SendtoGrave(g, REASON_COST + REASON_MATERIAL)
-
-	end
 	-- cook summon procedure
 	c:EnableReviveLimit()
 	--Fusion.AddProcMix(c, true, true, s.CARD_COWVERN, aux.FilterBoolFunctionEx(Card.IsRace, s.CLASS_BREAD))
-	Fusion.AddContactProc(c, cook_summon_condition, cook_summon_operation, special_summon_limit, nil, nil, nil, false)
+	Fusion.AddContactProc(c,
+		-- contact condition
+		function (tp)
+		return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost, tp, LOCATION_SZONE, 0, nil)
+		end,
+		-- contact operation
+		function (mg, tp)
+			local sumlvl = mg:GetSum(Card.GetLevel)
+
+			-- mix ingredients grade and apply to summoned dish as new grade
+			local e1 = Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CHANGE_LEVEL)
+			e1:SetValue(sumlvl)
+			c:RegisterEffect(e1)
+
+			Duel.SendtoGrave(mg, REASON_COST + REASON_MATERIAL)
+		end,
+		-- contact limit
+		function (e, c, tp, sumtype, pos, tgp, re)
+			return (sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION
+		end,
+		nil, nil, nil
+	)
 
 	-- health simulation effs
 
