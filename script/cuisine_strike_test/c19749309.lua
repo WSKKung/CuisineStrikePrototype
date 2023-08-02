@@ -8,7 +8,7 @@ local power_boost_multiplier = 100
 
 function s.initial_effect(c)
 
-	cs.initial_dish_effect(c)
+	cs.InitializeDishEffects(c)
 
 	-- cook summon procedures
 	Fusion.AddProcMix(c, true, true, cs.CARD_PIG_FAIRY, aux.FilterBoolFunctionEx(Card.IsRace, cs.CLASS_EGG))

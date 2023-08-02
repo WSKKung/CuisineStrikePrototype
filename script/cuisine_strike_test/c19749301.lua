@@ -7,7 +7,7 @@ Duel.LoadScript("cuisine_strike_common.lua")
 local damage_reduc_amoount = 200
 
 function s.initial_effect(c)
-	cs.initial_ingredient_effect(c, {grade=2})
+	cs.InitializeIngredientEffects(c, {grade=2})
 
 	local damage_reduc_e = Effect.CreateEffect(c)
 	damage_reduc_e:SetType(EFFECT_TYPE_FIELD)

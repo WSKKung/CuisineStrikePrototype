@@ -8,7 +8,7 @@ local damage_multiplier = 100
 
 function s.initial_effect(c)
 
-	cs.initial_dish_effect(c)
+	cs.InitializeDishEffects(c)
 
 	-- cook summon procedure
 	Fusion.AddProcMix(c, true, true, cs.CARD_METEGGOR, aux.FilterBoolFunctionEx(Card.IsRace, cs.CLASS_MEAT))

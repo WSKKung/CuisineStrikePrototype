@@ -8,7 +8,7 @@ local min_power_destroy_target = 400
 
 function s.initial_effect(c)
 
-	cs.initial_dish_effect(c)
+	cs.InitializeDishEffects(c)
 
 	-- cook summon procedure
 	Fusion.AddProcMixN(c, true, true, cs.CARD_METEGGOR, 2)

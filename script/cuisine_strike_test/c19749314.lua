@@ -7,7 +7,7 @@ Duel.LoadScript("cuisine_strike_common.lua")
 local damage_amount = 300
 
 function s.initial_effect(c)
-	cs.initial_ingredient_effect(c, {grade=2})
+	cs.InitializeIngredientEffects(c, {grade=2})
 
 	local e1 = Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DEFCHANGE)

@@ -7,7 +7,7 @@ Duel.LoadScript("cuisine_strike_common.lua")
 local power_boost_amount = 100
 
 function s.initial_effect(c)
-	cs.initial_ingredient_effect(c, {grade=2})
+	cs.InitializeIngredientEffects(c, {grade=2})
 
 	local power_boost_e = Effect.CreateEffect(c)
 	power_boost_e:SetType(EFFECT_TYPE_FIELD)

@@ -105,7 +105,7 @@ end
 --- @param c Card
 --- @param grade integer
 --- @param props {grade: integer}
-function cs.initial_ingredient_effect(c, props)
+function cs.InitializeIngredientEffects(c, props)
 
 	local grade = 0
 	if props["grade"] ~= nil then grade = props["grade"] end
@@ -153,7 +153,7 @@ end
 
 --- 
 --- @param c Card
-function cs.initial_dish_effect(c)
+function cs.InitializeDishEffects(c)
 
 	local function special_summon_limit(e, se, sp, st)
 		return (st & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION
@@ -244,7 +244,7 @@ end
 
 --- 
 --- @param c Card
-function cs.initial_action_effect(c)
+function cs.InitializeActionEffects(c)
 
 	local cannot_set_eff=Effect.CreateEffect(c)
 	cannot_set_eff:SetType(EFFECT_TYPE_FIELD)
@@ -262,21 +262,6 @@ function cs.initial_action_effect(c)
 	use_from_hand_eff:SetCode(EFFECT_TRAP_ACT_IN_HAND)
 	c:RegisterEffect(use_from_hand_eff)
 
-end
-
---- 
---- @param c Card
---- @param ... integer classes
-function cs.initial_dish_classes(c, ...)
-	for _, class in ipairs{...} do
-		local e1 = Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e1:SetRange(LOCATION_ALL)
-		e1:SetCode(EFFECT_ADD_RACE)
-		e1:SetValue(class)
-		c:RegisterEffect(e1)
-	end
 end
 
 --- 
@@ -303,4 +288,52 @@ function cs.CreateShieldEffect(c)
 		re:SetLabel(new_damage)
 	end)
 	return e1
+end
+
+--- 
+--- @param c Card
+--- @param params {cost: function, condition: function, target: function, operation: function}
+--- @return Effect
+function cs.CreateActionActivationEffect(c, params)
+	
+	local e1 = Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetRange(LOCATION_HAND)
+
+	if params.condition then
+		e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
+			if Duel.GetCurrentChain(true) > 0 then return false end
+			return params.condition(e, tp, eg, ep, ev, re, r, rp)
+		end)
+	else
+		e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
+			return Duel.GetCurrentChain(true) > 0
+		end)
+	end
+
+	if params.cost then
+		e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk, ...)
+			local c = e:GetHandler()
+			if chk==0 then return c:IsDiscardable() and params.cost(e, tp, eg, ep, ev, re, r, rp, chk, ...) end
+			Duel.SendtoGrave(c, REASON_COST + REASON_DISCARD)
+			params.cost(e, tp, eg, ep, ev, re, r, rp, chk, ...)
+		end)
+	else
+		e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk, ...)
+			local c = e:GetHandler()
+			if chk==0 then return c:IsDiscardable() end
+			Duel.SendtoGrave(c, REASON_COST + REASON_DISCARD)
+		end)
+	end
+
+	if params.target then
+		e1:SetTarget(params.target)
+	end
+
+	if params.operation then
+		e1:SetOperation(params.operation)
+	end
+
+	return e1
+
 end
