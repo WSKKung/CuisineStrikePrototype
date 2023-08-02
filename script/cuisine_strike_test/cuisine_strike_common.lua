@@ -1,4 +1,5 @@
 ---@version 5.3
+---@module "edopro_typehint_helper"
 
 CuisineStrike = {}
 
@@ -175,9 +176,8 @@ function CuisineStrike.InitializeDishEffects(c)
 		end,
 		-- contact limit
 		function (e, c, tp, sumtype, pos, tgp, re)
-			return (sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION
-		end,
-		nil, nil, nil
+			return (sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION and pos == POS_FACEUP_ATTACK
+		end
 	)
 
 	-- health simulation effs
@@ -232,9 +232,26 @@ function CuisineStrike.InitializeDishEffects(c)
 	local no_battle_damage_eff=Effect.CreateEffect(c)
 	no_battle_damage_eff:SetType(EFFECT_TYPE_SINGLE)
 	no_battle_damage_eff:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	no_battle_damage_eff:SetValue(1)
+	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	no_battle_damage_eff:SetTargetRange(1, 0)
+	no_battle_damage_eff:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
+			local c = e:GetHandler()
+			Debug.Message(e .. tp .. eg .. ep)
+			--[[
+			for index, p_eff in ipairs{c:GetCardEffect(EFFECT_PIERCE)} do
+				local condition_func = p_eff:GetCondition()
+				if condition_func then
+					
+				else
+					return false
+				end
+			end
+			]]
+			return true
+	end)
 	c:RegisterEffect(no_battle_damage_eff)
 end
+
 
 ---Initialize all effects common to every action cards to the given (c Card)\
 ---Action card activated effect should be created by using `CuisineStrike.CreateActionActivationEffect` function instead of manually create Effect instance.\
@@ -258,32 +275,6 @@ function CuisineStrike.InitializeActionEffects(c)
 	use_from_hand_eff:SetCode(EFFECT_TRAP_ACT_IN_HAND)
 	c:RegisterEffect(use_from_hand_eff)
 
-end
-
---- 
---- @param c Card
---- @return Effect
-function CuisineStrike.CreateShieldEffect(c)
-	--- @type Effect
-	local e1 = Effect.CreateEffect(c)
-	--e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetType(EFFECT_TYPE_QUICK_F)
-	e1:SetCode(EVENT_CHAINING)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp)
-		return true --ep == 1-tp and re:IsHasCategory(CATEGORY_DEFCHANGE) and re:GetLabel() < 0
-	end)
-	e1:SetTarget(function (e, tp, eg, ep, ev, re, r, rp, chk)
-		if chk==0 then
-			return re:IsHasCategory(CATEGORY_DEFCHANGE) and re:GetLabel() < 0
-		end
-	end)
-	e1:SetOperation(function (e, tp, eg, ep, ev, re, r, rp)
-		local original_damage = re:GetLabel()
-		local new_damage = original_damage + 100
-		re:SetLabel(new_damage)
-	end)
-	return e1
 end
 
 --- Create activation effect for action card (c Card)
@@ -333,3 +324,4 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 	return e1
 
 end
+
