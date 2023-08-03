@@ -6,7 +6,7 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-local power_boost_amount = 100
+local power_boost_amount = 200
 
 function s.initial_effect(c)
 	CuisineStrike.InitializeIngredientEffects(c)

@@ -8,13 +8,13 @@ Duel.LoadScript("cuisine_strike_common.lua")
 
 function s.initial_effect(c)
 	CuisineStrike.InitializeIngredientEffects(c)
-	
+
 	-- recycle & grade up ingredient
 	local e1 = Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCountLimit(1)
-	
+
 	e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk)
 		local c = e:GetHandler()
 		if chk==0 then return Duel.GetFieldGroupCount(tp, LOCATION_HAND, 0) > 0 and c:IsAbleToGraveAsCost() end

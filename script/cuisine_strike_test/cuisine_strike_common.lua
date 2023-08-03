@@ -8,11 +8,18 @@ CuisineStrike.CARD_BUN_GARDNA = 19749301
 CuisineStrike.CARD_PIG_FAIRY = 19749302
 CuisineStrike.CARD_COWVERN = 19749303
 CuisineStrike.CARD_METEGGOR = 19749314
+CuisineStrike.CARD_TOMANTO = 19749321
+CuisineStrike.CARD_MEOWZZARELA = 19749322
+CuisineStrike.CARD_PEPPERONYX = 19749325
 
 -- common classes (race aliases)
 CuisineStrike.CLASS_MEAT = RACE_BEAST
 CuisineStrike.CLASS_BREAD = RACE_ROCK
 CuisineStrike.CLASS_EGG = RACE_REPTILE
+CuisineStrike.CLASS_VEGETABLE = RACE_PLANT
+CuisineStrike.CLASS_CHEESE = RACE_THUNDER
+
+CuisineStrike.MAXIMUM_PLAYER_HP = 1500
 
 --- 
 --- @param c Card
@@ -26,6 +33,13 @@ end
 --- @return boolean 
 function CuisineStrike.IsAbleToHeal(c)
 	return c:GetDefense() < c:GetBaseDefense()
+end
+
+--- 
+--- @param player Player
+--- @return boolean 
+function CuisineStrike.IsPlayerAbleToHeal(player)
+	return Duel.GetLP(player) < CuisineStrike.MAXIMUM_PLAYER_HP
 end
 
 
@@ -75,6 +89,27 @@ function CuisineStrike.Heal(c, amount)
 	end
 
 	return amount
+end
+
+--- Heals a player
+--- @param player any
+--- @param amount any
+--- @return integer The amount of Health healed
+function CuisineStrike.HealPlayer(player, amount)
+	local max_hp = CuisineStrike.MAXIMUM_PLAYER_HP
+	local cur_hp = Duel.GetLP(player)
+	local healed_health = cur_hp + amount
+
+	if healed_health > max_hp then
+		amount = max_hp - cur_hp
+	end
+
+	if amount > 0 then
+		Duel.Recover(player, amount, REASON_EFFECT)
+	end
+
+	return amount
+
 end
 
 --- Deals a damage to a specified card Unit (c Card) with the given amount (int amount)\
@@ -177,7 +212,8 @@ function CuisineStrike.InitializeDishEffects(c)
 		-- contact limit
 		function (e, c, tp, sumtype, pos, tgp, re)
 			return (sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION and pos == POS_FACEUP_ATTACK
-		end
+		end,
+		nil, nil, nil, false
 	)
 
 	-- health simulation effs
@@ -234,19 +270,15 @@ function CuisineStrike.InitializeDishEffects(c)
 	no_battle_damage_eff:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	no_battle_damage_eff:SetTargetRange(1, 0)
-	no_battle_damage_eff:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
+	no_battle_damage_eff:SetValue(function (e, tc, ...)
 			local c = e:GetHandler()
-			Debug.Message(e .. tp .. eg .. ep)
-			--[[
-			for index, p_eff in ipairs{c:GetCardEffect(EFFECT_PIERCE)} do
-				local condition_func = p_eff:GetCondition()
-				if condition_func then
-					
-				else
+			for _, p_eff in ipairs{tc:GetCardEffect(EFFECT_PIERCE)} do
+				local pierce_condition = p_eff:GetCondition()
+				if not pierce_condition or pierce_condition(p_eff) then
 					return false
 				end
 			end
-			]]
+			
 			return true
 	end)
 	c:RegisterEffect(no_battle_damage_eff)
@@ -279,7 +311,7 @@ end
 
 --- Create activation effect for action card (c Card)
 --- @param c Card
---- @param params {cost: function, condition: function, target: function, operation: function}
+--- @param params {cost: CostFunction, condition: ConditionFunction, target: TargetFunction, operation: OperationFunction}
 --- @return Effect
 function CuisineStrike.CreateActionActivationEffect(c, params)
 	
@@ -294,7 +326,7 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 		end)
 	else
 		e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
-			return Duel.GetCurrentChain(true) > 0
+			return Duel.GetCurrentChain(true) == 0
 		end)
 	end
 
