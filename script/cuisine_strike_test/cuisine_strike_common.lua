@@ -263,7 +263,7 @@ function CuisineStrike.InitializeDishEffects(c)
 	indestructible_in_battle_eff:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	indestructible_in_battle_eff:SetValue(true)
 	c:RegisterEffect(indestructible_in_battle_eff)
-	
+
 	--prevent battle damage
 	local no_battle_damage_eff=Effect.CreateEffect(c)
 	no_battle_damage_eff:SetType(EFFECT_TYPE_SINGLE)
@@ -271,15 +271,14 @@ function CuisineStrike.InitializeDishEffects(c)
 	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	no_battle_damage_eff:SetTargetRange(1, 0)
 	no_battle_damage_eff:SetValue(function (e, tc, ...)
-			local c = e:GetHandler()
-			for _, p_eff in ipairs{tc:GetCardEffect(EFFECT_PIERCE)} do
-				local pierce_condition = p_eff:GetCondition()
-				if not pierce_condition or pierce_condition(p_eff) then
-					return false
-				end
+		if not tc then return true end
+		for _, p_eff in ipairs{tc:GetCardEffect(EFFECT_PIERCE)} do
+			local pierce_condition = p_eff:GetCondition()
+			if not pierce_condition or pierce_condition(p_eff) then
+				return false
 			end
-			
-			return true
+		end
+		return true
 	end)
 	c:RegisterEffect(no_battle_damage_eff)
 end
@@ -317,8 +316,8 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 	
 	local e1 = Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_HAND)
-
 	if params.condition then
 		e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
 			if Duel.GetCurrentChain(true) > 0 then return false end
