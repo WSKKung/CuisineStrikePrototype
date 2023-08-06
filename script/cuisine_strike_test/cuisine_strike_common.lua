@@ -2,23 +2,31 @@
 ---@module "edopro_typehint_helper"
 
 CuisineStrike = {}
+CS = CuisineStrike
+
+-- common card types
+CS.TYPE_INGREDIENT = TYPE_MONSTER + TYPE_EFFECT + TYPE_TUNER
+CS.TYPE_DISH = TYPE_MONSTER + TYPE_EFFECT + TYPE_FUSION
+CS.TYPE_ACTION = TYPE_TRAP
 
 -- common card ids
-CuisineStrike.CARD_BUN_GARDNA = 19749301
-CuisineStrike.CARD_PIG_FAIRY = 19749302
-CuisineStrike.CARD_COWVERN = 19749303
-CuisineStrike.CARD_METEGGOR = 19749314
-CuisineStrike.CARD_TOMANTO = 19749321
-CuisineStrike.CARD_MEOWZZARELA = 19749322
-CuisineStrike.CARD_PEPPERONYX = 19749325
+CS.CARD_BUN_GARDNA = 19749301
+CS.CARD_PIG_FAIRY = 19749302
+CS.CARD_COWVERN = 19749303
+CS.CARD_METEGGOR = 19749314
+CS.CARD_TOMANTO = 19749321
+CS.CARD_MEOWZZARELA = 19749322
+CS.CARD_PEPPERONYX = 19749325
 
 -- common classes (race aliases)
-CuisineStrike.CLASS_MEAT = RACE_BEAST
-CuisineStrike.CLASS_BREAD = RACE_ROCK
-CuisineStrike.CLASS_EGG = RACE_REPTILE
-CuisineStrike.CLASS_VEGETABLE = RACE_PLANT
-CuisineStrike.CLASS_CHEESE = RACE_THUNDER
+CS.CLASS_MEAT = RACE_BEAST
+CS.CLASS_BREAD = RACE_ROCK
+CS.CLASS_GRAIN = RACE_INSECT
+CS.CLASS_EGG = RACE_REPTILE
+CS.CLASS_VEGETABLE = RACE_PLANT
+CS.CLASS_CHEESE = RACE_THUNDER
 
+-- game rule constants
 CuisineStrike.MAXIMUM_PLAYER_HP = 1500
 
 --- 
@@ -46,22 +54,22 @@ end
 --- 
 --- @param c Card
 --- @return boolean 
-function CuisineStrike.IsDishCard(c)
-	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_FUSION)
+function CS.IsDishCard(c)
+	return (c:GetType() & CS.TYPE_DISH) == CS.TYPE_DISH
 end
 
 --- 
 --- @param c Card
 --- @return boolean 
-function CuisineStrike.IsIngredientCard(c)
-	return c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_EXTRA)
+function CS.IsIngredientCard(c)
+	return (c:GetType() & CS.TYPE_INGREDIENT) == CS.TYPE_INGREDIENT
 end
 
 --- 
 --- @param c Card
 --- @return boolean 
-function CuisineStrike.IsActionCard(c)
-	return c:IsType(TYPE_TRAP)
+function CS.IsActionCard(c)
+	return (c:GetType() & CS.TYPE_ACTION) == CS.TYPE_ACTION
 end
 
 --- Heals a specified card Unit (c Card) with the given amount of Health (int amount)\
@@ -92,8 +100,8 @@ function CuisineStrike.Heal(c, amount)
 end
 
 --- Heals a player
---- @param player any
---- @param amount any
+--- @param player Player
+--- @param amount integer
 --- @return integer The amount of Health healed
 function CuisineStrike.HealPlayer(player, amount)
 	local max_hp = CuisineStrike.MAXIMUM_PLAYER_HP
@@ -137,11 +145,21 @@ function CuisineStrike.Damage(c, amount)
 	return amount
 end
 
+---Initialize common effects to a card appropiate to their card type value configured in the database as following\
+---Ingredient card: Tuner Effect monster\
+---Dish card: Fusion Effect monster (add Tuner type to signify that this card can be used as an Ingredient)\
+---Action card: Trap
+---@param c Card
+function CS.InitCommonEffects(c)
+	if CS.IsDishCard(c) then CS.InitializeDishEffects(c)
+	elseif CS.IsIngredientCard(c) then CS.InitializeDishEffects(c)
+	elseif CS.IsActionCard(c) then CS.InitializeActionEffects(c) end
+end
+
+
 --- Initialize all effects common to every ingredient cards to the given (c Card)
 --- @param c Card
 function CuisineStrike.InitializeIngredientEffects(c)
-
-	local grade = c:GetOriginalLevel()
 
 	-- disallow all summons
 	c:EnableUnsummonable()
@@ -151,20 +169,19 @@ function CuisineStrike.InitializeIngredientEffects(c)
 	set_backrow_eff:SetType(EFFECT_TYPE_IGNITION)
 	set_backrow_eff:SetRange(LOCATION_HAND)
 
-	local cost_filter = function(c)
-		return c:IsType(TYPE_MONSTER) and c:GetLevel() >= (grade - 1)
-	end
-	
-	local cost_check = function(e, tp)
-		if grade > 1 then
-			return Duel.IsExistingMatchingCard(cost_filter, tp, LOCATION_SZONE, 0, 1, nil)
-		else
-			return Duel.GetLocationCount(tp, LOCATION_SZONE) > 0
-		end
-	end
-
 	set_backrow_eff:SetCost(function(e, tp, eg, ep, ev, re, r, rp, chk)
-		if chk==0 then return cost_check(e, tp) end
+		local grade = e:GetHandler():GetLevel()
+		---@type CardFilterFunction
+		local cost_filter = function (c)
+			return c:IsType(CS.TYPE_INGREDIENT) and c:GetLevel() >= (grade - 1)
+		end
+		if chk==0 then
+			if grade > 1 then
+				return Duel.IsExistingMatchingCard(cost_filter, tp, LOCATION_SZONE, 0, 1, nil)
+			else
+				return Duel.GetLocationCount(tp, LOCATION_SZONE) > 0
+			end
+		end
 		if grade > 1 then
 			Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TOGRAVE)
 			local g = Duel.SelectMatchingCard(tp, cost_filter, tp, LOCATION_SZONE, 0, 1, 1, nil)
@@ -199,7 +216,6 @@ function CuisineStrike.InitializeDishEffects(c)
 		-- contact operation
 		function (mg, tp)
 			local sumlvl = mg:GetSum(Card.GetLevel)
-
 			-- mix ingredients grade and apply to summoned dish as new grade
 			local e1 = Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
@@ -223,7 +239,7 @@ function CuisineStrike.InitializeDishEffects(c)
 	hp_sim_eff:SetType(EFFECT_TYPE_SINGLE + EFFECT_TYPE_TRIGGER_F)
 	hp_sim_eff:SetCode(EVENT_BATTLED)
 	hp_sim_eff:SetRange(LOCATION_MZONE)
-	
+
 	hp_sim_eff:SetCondition(function (e, tp, eg, ep, ev, re, r, rp)
 		local bc = e:GetHandler():GetBattleTarget()
 		return bc and bc:GetAttack() > 0
@@ -281,6 +297,27 @@ function CuisineStrike.InitializeDishEffects(c)
 		return true
 	end)
 	c:RegisterEffect(no_battle_damage_eff)
+
+	-- place into spell/trap zone if its an ingredient
+	if (CS.IsIngredientCard(c)) then
+		local set_backrow_eff = Effect.CreateEffect(c)
+		set_backrow_eff:SetType(EFFECT_TYPE_IGNITION)
+		set_backrow_eff:SetRange(LOCATION_MZONE)
+
+		set_backrow_eff:SetCost(function(e, tp, eg, ep, ev, re, r, rp, chk)
+			if chk==0 then return Duel.GetLocationCount(tp, LOCATION_SZONE) > 0 end
+		end)
+
+		set_backrow_eff:SetOperation(function(e, tp, eg, ep, ev, re, r, rp)
+			local tc = e:GetHandler()
+			if tc then
+				Duel.MoveToField(tc, tp, tp, LOCATION_SZONE, POS_FACEUP, true)
+			end
+		end)
+
+		c:RegisterEffect(set_backrow_eff)
+	end
+
 end
 
 
@@ -313,7 +350,7 @@ end
 --- @param params {cost: CostFunction, condition: ConditionFunction, target: TargetFunction, operation: OperationFunction}
 --- @return Effect
 function CuisineStrike.CreateActionActivationEffect(c, params)
-	
+
 	local e1 = Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)

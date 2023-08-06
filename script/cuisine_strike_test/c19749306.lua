@@ -14,7 +14,7 @@ function s.initial_effect(c)
 
 	-- cook summon procedures
 	Fusion.AddProcMix(c, true, true, CuisineStrike.CARD_COWVERN, aux.FilterBoolFunctionEx(Card.IsRace, CuisineStrike.CLASS_BREAD))
-	
+
 	-- increase atk
 	local atk_boost_eff = Effect.CreateEffect(c)
 	atk_boost_eff:SetType(EFFECT_TYPE_SINGLE)
