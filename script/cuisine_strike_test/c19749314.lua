@@ -13,9 +13,7 @@ function s.initial_effect(c)
 
 	local e1 = Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DEFCHANGE)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_SZONE)
 
 	e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk)

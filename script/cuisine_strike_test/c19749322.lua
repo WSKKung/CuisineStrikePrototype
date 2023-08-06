@@ -6,22 +6,17 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-local heal_amount = 200
+local power_reduce_amount = 200
 
 function s.initial_effect(c)
 	CuisineStrike.InitializeIngredientEffects(c)
 
-	local e1 = Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_RECOVER)
-	e1:SetType(EFFECT_TYPE_QUICK_F)
-	e1:SetRange(LOCATION_SZONE)
-	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp)
-		return Duel.GetAttacker():IsControler(1-tp) and CuisineStrike.IsPlayerAbleToHeal(tp)
-	end)
-	e1:SetOperation(function (e, tp, eg, ep, ev, re, r, rp, ...)
-		CuisineStrike.HealPlayer(tp, heal_amount)
-	end)
-	c:RegisterEffect(e1)
-
+	local power_reduc_e = Effect.CreateEffect(c)
+	power_reduc_e:SetType(EFFECT_TYPE_FIELD)
+	power_reduc_e:SetCode(EFFECT_UPDATE_ATTACK)
+	power_reduc_e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	power_reduc_e:SetRange(LOCATION_SZONE)
+	power_reduc_e:SetTargetRange(0, LOCATION_MZONE)
+	power_reduc_e:SetValue(-power_reduce_amount)
+	c:RegisterEffect(power_reduc_e)
 end
