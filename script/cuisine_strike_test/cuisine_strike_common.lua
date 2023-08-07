@@ -4,6 +4,9 @@
 CuisineStrike = {}
 CS = CuisineStrike
 
+-- common setcode
+CS.SERIES_CUISINE_STRIKE = 0x6934
+
 -- common card types
 CS.TYPE_INGREDIENT = TYPE_MONSTER + TYPE_EFFECT + TYPE_TUNER
 CS.TYPE_DISH = TYPE_MONSTER + TYPE_EFFECT + TYPE_FUSION
@@ -200,37 +203,84 @@ function CuisineStrike.InitializeIngredientEffects(c)
 	c:RegisterEffect(set_backrow_eff)
 end
 
-
 --- Initialize all effects common to every dish cards to the given (c Card)
 --- @param c Card
 function CuisineStrike.InitializeDishEffects(c)
 
-	-- cook summon procedure
+	-- must be properly summoned first
 	c:EnableReviveLimit()
-	--Fusion.AddProcMix(c, true, true, s.CARD_COWVERN, aux.FilterBoolFunctionEx(Card.IsRace, s.CLASS_BREAD))
+
+	--[[
 	Fusion.AddContactProc(c,
-		-- contact condition
 		function (tp)
-		return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost, tp, LOCATION_SZONE, 0, nil)
+			return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost, tp, LOCATION_SZONE, 0, nil)
 		end,
-		-- contact operation
+		---contact operation
+		---@param mg Group
+		---@param tp Player
 		function (mg, tp)
+			-- get sum level before sending them to gy to avoid level reset when material leave the field
 			local sumlvl = mg:GetSum(Card.GetLevel)
+			Duel.SendtoGrave(mg, REASON_COST + REASON_MATERIAL)
 			-- mix ingredients grade and apply to summoned dish as new grade
 			local e1 = Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_CHANGE_LEVEL)
 			e1:SetValue(sumlvl)
 			c:RegisterEffect(e1)
+		end,
+		nil,
+		nil,
+		SUMMON_TYPE_FUSION,
+		nil, false
+	)]]
+	local cook_proc_group = function (tp)
+		return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost, tp, LOCATION_SZONE, 0, nil)
+	end
 
-			Duel.SendtoGrave(mg, REASON_COST + REASON_MATERIAL)
-		end,
-		-- contact limit
-		function (e, c, tp, sumtype, pos, tgp, re)
-			return (sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION and pos == POS_FACEUP_ATTACK
-		end,
-		nil, nil, nil, false
+	-- cook summon procedure
+	local cook_proc_eff = Effect.CreateEffect(c)
+	cook_proc_eff:SetType(EFFECT_TYPE_FIELD)
+	cook_proc_eff:SetCode(EFFECT_SPSUMMON_PROC)
+	cook_proc_eff:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	cook_proc_eff:SetRange(LOCATION_EXTRA)
+	cook_proc_eff:SetCondition(Fusion.ContactCon(cook_proc_group, nil))
+	cook_proc_eff:SetTarget(
+		-- modified version of Fusion.ContactTg to includes combined Level restriction
+		function(e, tp, eg, ep, ev, re, r, rp)
+			local m = cook_proc_group(tp)
+			local chkf = tp | FUSPROC_CONTACTFUS
+			local sg = Duel.SelectFusionMaterial(tp, e:GetHandler(), m, nil, chkf)
+			if #sg>0 then
+				-- check cook summon restriction
+				if sg:GetSum(Card.GetLevel) < e:GetHandler():GetOriginalLevel() then
+					Duel.Hint(HINT_MESSAGE, tp, 3941)
+					return false
+				end
+				sg:KeepAlive()
+				e:SetLabelObject(sg)
+				return true
+			else return false end
+		end
 	)
+	cook_proc_eff:SetOperation(Fusion.ContactOp(
+		---contact operation
+		---@param mg Group
+		---@param tp Player
+		function (mg, tp)
+			-- get sum level before sending them to gy to avoid level reset when material leave the field
+			local sumlvl = mg:GetSum(Card.GetLevel)
+			Duel.SendtoGrave(mg, REASON_COST + REASON_MATERIAL)
+			-- mix ingredients grade and apply to summoned dish as new grade
+			local e1 = Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CHANGE_LEVEL)
+			e1:SetValue(sumlvl)
+			c:RegisterEffect(e1)
+		end)
+	)
+	cook_proc_eff:SetValue(SUMMON_TYPE_FUSION)
+	c:RegisterEffect(cook_proc_eff)
 
 	-- health simulation effs
 
