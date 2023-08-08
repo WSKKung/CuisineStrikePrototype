@@ -13,9 +13,10 @@ CS.TYPE_DISH = TYPE_MONSTER + TYPE_EFFECT + TYPE_FUSION
 CS.TYPE_ACTION = TYPE_TRAP
 
 -- common card ids
-CS.CARD_BUN_GARDNA = 19749301
+CS.CARD_BUN_GARDNA = 197493006
+CS.CARD_COWVERN = 197493062
+
 CS.CARD_PIG_FAIRY = 19749302
-CS.CARD_COWVERN = 19749303
 CS.CARD_METEGGOR = 19749314
 CS.CARD_TOMANTO = 19749321
 CS.CARD_MEOWZZARELA = 19749322
@@ -29,14 +30,38 @@ CS.CLASS_EGG = RACE_REPTILE
 CS.CLASS_VEGETABLE = RACE_PLANT
 CS.CLASS_CHEESE = RACE_THUNDER
 
+-- common hint message
+CS.HINTMSG_COOK_SUMMON_NOT_ENOUGH_TOTAL_GRADE = 3941
+CS.HINTMSG_SET_INGREDIENT_DISH_FROM_FIELD = 3942
+
+-- common events
+CS.EVENT_DISH_TAKEN_DAMAGE = EVENT_CUSTOM + 19749301
+
+-- common effect codes
+CS.EFFECT_UPDATE_ARMOR_VALUE = EVENT_CUSTOM + 19749301
+
 -- game rule constants
-CuisineStrike.MAXIMUM_PLAYER_HP = 1500
+CS.MAXIMUM_PLAYER_HP = 1500
 
 --- 
 --- @param c Card
 --- @return integer 
-function CuisineStrike.GetBonusGrade(c)
-	return c:GetLevel() - c:GetOriginalLevel()
+function CS.GetGrade(c)
+	return c:GetLevel()
+end
+
+--- 
+--- @param c Card
+--- @return integer 
+function CS.GetBaseGrade(c)
+	return c:GetOriginalLevel()
+end
+
+--- 
+--- @param c Card
+--- @return integer 
+function CS.GetBonusGrade(c)
+	return CS.GetGrade(c) - CS.GetBaseGrade(c)
 end
 
 --- 
@@ -126,19 +151,38 @@ end
 --- Deals a damage to a specified card Unit (c Card) with the given amount (int amount)\
 --- @param c Card
 --- @param amount integer
+--- @param reason Reason? default to 0
+--- @param reason_card Card? default to the card taken damage itself
+--- @param reason_player Player? default to owner of reason_card
 --- @return integer The amount of damage dealt
-function CuisineStrike.Damage(c, amount)
+function CuisineStrike.Damage(c, amount, reason, reason_card, reason_player)
+
+	reason = reason or 0
+	reason_card = reason_card or c
+	reason_player = reason_player or c:GetOwner()
 
 	local cur_health = c:GetDefense()
 
-	if amount > cur_health then
-		amount = cur_health
+	-- apply armor effect of the target card
+	for _, armored_eff in ipairs{c:GetCardEffect(CS.EFFECT_UPDATE_ARMOR_VALUE)} do
+		local armor_condition = armored_eff:GetCondition()
+		if not armor_condition or armor_condition(armored_eff, c:GetOwner(), Group.FromCards(reason_card), c:GetOwner(), amount, nil, reason, reason_player) then
+			local armor_val = armored_eff:GetValue() or 0
+			if type(armor_val) == "function" then
+				amount = amount - armor_val(armored_eff)
+			else
+				amount = amount - armor_val
+			end
+		end
 	end
 
+	if amount > cur_health then amount = cur_health end
+
 	if amount > 0 then
-		local e1 = Effect.CreateEffect(c)
-		e1:SetCategory(CATEGORY_DEFCHANGE)
+		local e1 = Effect.CreateEffect(reason_card)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetValue(amount)
+		e1:SetCategory(CATEGORY_DEFCHANGE)
 		e1:SetCode(EFFECT_UPDATE_DEFENSE)
 		e1:SetReset(RESET_EVENT + RESETS_STANDARD_DISABLE)
 		e1:SetValue(-amount)
@@ -155,7 +199,7 @@ end
 ---@param c Card
 function CS.InitCommonEffects(c)
 	if CS.IsDishCard(c) then CS.InitializeDishEffects(c)
-	elseif CS.IsIngredientCard(c) then CS.InitializeDishEffects(c)
+	elseif CS.IsIngredientCard(c) then CS.InitializeIngredientEffects(c)
 	elseif CS.IsActionCard(c) then CS.InitializeActionEffects(c) end
 end
 
@@ -253,8 +297,9 @@ function CuisineStrike.InitializeDishEffects(c)
 			local sg = Duel.SelectFusionMaterial(tp, e:GetHandler(), m, nil, chkf)
 			if #sg>0 then
 				-- check cook summon restriction
+				-- TODO: Add restriction check to condition check phase, Th
 				if sg:GetSum(Card.GetLevel) < e:GetHandler():GetOriginalLevel() then
-					Duel.Hint(HINT_MESSAGE, tp, 3941)
+					Duel.Hint(HINT_MESSAGE, tp, CS.HINTMSG_COOK_SUMMON_NOT_ENOUGH_TOTAL_GRADE)
 					return false
 				end
 				sg:KeepAlive()
@@ -300,14 +345,15 @@ function CuisineStrike.InitializeDishEffects(c)
 		-- calculate received damage before applying to avoid battle target whose atk are modified leaves the field before applying damage to this card
 		local c = e:GetHandler()
 		local tc = c:GetBattleTarget()
-		local damage = -tc:GetAttack()
+		local damage = tc:GetAttack()
 		e:SetLabel(damage)
+		
 	end)
 
 	hp_sim_eff:SetOperation(function (e, tp, eg, ep, ev, re, r, rp)
 		local c = e:GetHandler()
 		local damage = e:GetLabel()
-		CuisineStrike.Damage(c, -damage)
+		CS.Damage(c, damage, REASON_BATTLE, c:GetBattleTarget(), 1-tp)
 	end)
 
 	c:RegisterEffect(hp_sim_eff)
@@ -351,6 +397,7 @@ function CuisineStrike.InitializeDishEffects(c)
 	-- place into spell/trap zone if its an ingredient
 	if (CS.IsIngredientCard(c)) then
 		local set_backrow_eff = Effect.CreateEffect(c)
+		set_backrow_eff:SetDescription(CS.HINTMSG_SET_INGREDIENT_DISH_FROM_FIELD)
 		set_backrow_eff:SetType(EFFECT_TYPE_IGNITION)
 		set_backrow_eff:SetRange(LOCATION_MZONE)
 
@@ -393,6 +440,36 @@ function CuisineStrike.InitializeActionEffects(c)
 	use_from_hand_eff:SetCode(EFFECT_TRAP_ACT_IN_HAND)
 	c:RegisterEffect(use_from_hand_eff)
 
+end
+
+---Add bonus stat effects to a dish, scaling by their bonus grade
+---@param c Card
+---@param bonus_str any
+---@param bonus_def any
+function CS.InitBonusStatEffects(c, bonus_str, bonus_def)
+	if not CS.IsDishCard(c) then return end
+	if bonus_str > 0 then
+		local bonus_str_eff = Effect.CreateEffect(c)
+		bonus_str_eff:SetType(EFFECT_TYPE_SINGLE)
+		bonus_str_eff:SetRange(LOCATION_MZONE)
+		bonus_str_eff:SetCategory(CATEGORY_ATKCHANGE)
+		bonus_str_eff:SetCode(EFFECT_UPDATE_ATTACK)
+		bonus_str_eff:SetValue(function (e)
+			return CS.GetBonusGrade(c) * bonus_str
+		end)
+		c:RegisterEffect(bonus_str_eff)
+	end
+	if bonus_def > 0 then
+		local bonus_def_eff = Effect.CreateEffect(c)
+		bonus_def_eff:SetType(EFFECT_TYPE_SINGLE)
+		bonus_def_eff:SetRange(LOCATION_MZONE)
+		bonus_def_eff:SetCategory(CATEGORY_DEFCHANGE)
+		bonus_def_eff:SetCode(EFFECT_UPDATE_DEFENSE)
+		bonus_def_eff:SetValue(function (e)
+			return CS.GetBonusGrade(c) * bonus_def
+		end)
+		c:RegisterEffect(bonus_def_eff)
+	end
 end
 
 --- Create activation effect for action card (c Card)
@@ -442,4 +519,3 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 	return e1
 
 end
-
