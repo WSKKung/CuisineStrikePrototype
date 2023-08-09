@@ -36,8 +36,8 @@ function s.initial_effect(c)
 				tc:RegisterEffect(e2)
 				-- add helth
 				local e3 = e2:Clone()
-				e3:SetCode(EFFECT_SET_BASE_DEFENSE)
-				e3:SetValue(tc:GetBaseDefense() + 100)
+				e3:SetCode(EFFECT_UPDATE_DEFENSE)
+				e3:SetValue(100)
 				tc:RegisterEffect(e3)
 			end
 		end
