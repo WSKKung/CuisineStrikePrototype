@@ -444,8 +444,8 @@ end
 
 ---Add bonus stat effects to a dish, scaling by their bonus grade
 ---@param c Card
----@param bonus_str any
----@param bonus_def any
+---@param bonus_str integer
+---@param bonus_def integer
 function CS.InitBonusStatEffects(c, bonus_str, bonus_def)
 	if not CS.IsDishCard(c) then return end
 	if bonus_str > 0 then
