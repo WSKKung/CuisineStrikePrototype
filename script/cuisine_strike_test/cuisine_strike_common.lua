@@ -483,14 +483,7 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_HAND)
 	if params.condition then
-		e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
-			if Duel.GetCurrentChain(true) > 0 then return false end
-			return params.condition(e, tp, eg, ep, ev, re, r, rp)
-		end)
-	else
-		e1:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
-			return Duel.GetCurrentChain(true) == 0
-		end)
+		e1:SetCondition(params.condition)
 	end
 
 	if params.cost then
