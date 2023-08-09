@@ -11,7 +11,9 @@ s.grade_reduc_amount = 1
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 
-	local e1 = CuisineStrike.CreateActionActivationEffect(c, {
+	local e1 = CS.CreateActionEffect(c, {
+		type = "trigger",
+		code = EVENT_MOVE,
 		condition = function (e, tp, eg, ep, ev, re, r, rp)
 			return eg and eg:IsExists(s.ingredient_set_filter, 1, nil, tp)
 		end,
@@ -41,9 +43,6 @@ function s.initial_effect(c)
 			end
 		end
 	})
-	e1:SetCategory(CATEGORY_LVCHANGE)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetCode(EVENT_MOVE)
 	c:RegisterEffect(e1)
 
 end

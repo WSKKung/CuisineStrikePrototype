@@ -9,7 +9,8 @@ Duel.LoadScript("cuisine_strike_common.lua")
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 
-	local e1 = CuisineStrike.CreateActionActivationEffect(c, {
+	local e1 = CS.CreateActionEffect(c, {
+		type = "active",
 		target = function (e, tp, eg, ep, ev, re, r, rp, chk)
 			if chk==0 then return Duel.IsExistingMatchingCard(s.target_filter, tp, LOCATION_MZONE, 0, 1, nil) end
 		end,
@@ -21,8 +22,6 @@ function s.initial_effect(c)
 			end
 		end
 	})
-
-	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 
 end

@@ -9,7 +9,8 @@ Duel.LoadScript("cuisine_strike_common.lua")
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 
-	local e1 = CuisineStrike.CreateActionActivationEffect(c, {
+	local e1 = CS.CreateActionEffect(c, {
+		type = "active",
 		cost = function (e, tp, eg, ep, ev, re, r, rp, chk)
 			local c = e:GetHandler()
 			if chk==0 then return Duel.GetMatchingGroupCount(aux.TRUE, tp, LOCATION_HAND, 0, c) > 0 end
@@ -42,8 +43,6 @@ function s.initial_effect(c)
 			end
 		end
 	})
-
-	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 
 end

@@ -472,9 +472,48 @@ function CS.InitBonusStatEffects(c, bonus_str, bonus_def)
 	end
 end
 
+--- @alias ActionEffectType "trigger" | "active"
+
 --- Create activation effect for action card (c Card)
 --- @param c Card
---- @param params {cost: CostFunction, condition: ConditionFunction, target: TargetFunction, operation: OperationFunction}
+--- @param params {type: ActionEffectType, code: EffectCode?, properties: integer?, cost: CostFunction?, condition: ConditionFunction?, target: TargetFunction?, operation: OperationFunction?}
+--- @return Effect
+function CS.CreateActionEffect(c, params)
+
+	local e1 = Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetRange(LOCATION_HAND)
+
+	if params.type == "active" then
+		e1:SetCondition(CS.ActionCardActiveConditionFunction(params.condition))
+	elseif params.condition then
+		e1:SetCondition(params.condition)
+	end
+
+	e1:SetCost(CS.ActionCardCostFunction(params.cost))
+
+	if params.target then e1:SetTarget(params.target) end
+	if params.operation then e1:SetOperation(params.operation) end
+
+	if params.properties then
+		e1:SetProperty(EFFECT_FLAG_DELAY + params.properties)
+	else
+		e1:SetProperty(EFFECT_FLAG_DELAY)
+	end
+
+	if params.type == "active" then
+		e1:SetCode(EVENT_FREE_CHAIN)
+	elseif params.code ~= nil then
+		e1:SetCode(params.code)
+	end
+
+	return e1
+end
+
+--- Create activation effect for action card (c Card)
+--- @deprecated
+--- @param c Card
+--- @param params {type: ActionEffectType, cost: CostFunction?, condition: ConditionFunction?, target: TargetFunction?, operation: OperationFunction?}
 --- @return Effect
 function CuisineStrike.CreateActionActivationEffect(c, params)
 
@@ -482,24 +521,16 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_HAND)
-	if params.condition then
-		e1:SetCondition(params.condition)
+
+	if params.type == "active" then
+		e1:SetCondition(CS.ActionCardActiveConditionFunction(params.condition))
+	else
+		if params.condition then
+			e1:SetCondition(params.condition)
+		end
 	end
 
-	if params.cost then
-		e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk, ...)
-			local c = e:GetHandler()
-			if chk==0 then return c:IsDiscardable() and params.cost(e, tp, eg, ep, ev, re, r, rp, chk, ...) end
-			Duel.SendtoGrave(c, REASON_COST + REASON_DISCARD)
-			params.cost(e, tp, eg, ep, ev, re, r, rp, chk, ...)
-		end)
-	else
-		e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk, ...)
-			local c = e:GetHandler()
-			if chk==0 then return c:IsDiscardable() end
-			Duel.SendtoGrave(c, REASON_COST + REASON_DISCARD)
-		end)
-	end
+	e1:SetCost(CS.ActionCardCostFunction(params.cost))
 
 	if params.target then
 		e1:SetTarget(params.target)
@@ -511,4 +542,31 @@ function CuisineStrike.CreateActionActivationEffect(c, params)
 
 	return e1
 
+end
+
+--- Create activation cost function for action card (c Card)
+--- @param additional_cost function?
+--- @return function
+function CS.ActionCardCostFunction(additional_cost)
+	return function (e, tp, eg, ep, ev, re, r, rp, chk, ...)
+		local c = e:GetHandler()
+		if chk==0 then return c:IsDiscardable() and (not additional_cost or additional_cost(e, tp, eg, ep, ev, re, r, rp, chk, ...)) end
+		Duel.SendtoGrave(c, REASON_COST + REASON_DISCARD)
+		if additional_cost then
+			additional_cost(e, tp, eg, ep, ev, re, r, rp, chk, ...)
+		end
+	end
+end
+
+--- Create activation condition function for active type action card (c Card)
+--- @param additional_condition function?
+--- @return function
+function CS.ActionCardActiveConditionFunction(additional_condition)
+	return function (e, tp, eg, ep, ev, re, r, rp, ...)
+		-- active effect must not be activate in response to other effect
+		if Duel.GetCurrentChain() > 0 then return false end
+		-- active effect can only be activated on their own turn
+		if Duel.GetTurnPlayer() ~= tp then return false end
+		return not additional_condition or additional_condition(e, tp, eg, ep, ev, re, r, rp, ...)
+	end
 end
