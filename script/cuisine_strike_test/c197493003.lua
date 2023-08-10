@@ -33,15 +33,15 @@ function s.initial_effect(c)
 
 	e1:SetOperation(function (e, tp, eg, ep, ev, re, r, rp)
 		local c = e:GetHandler()
-		local extra_def_eff = Effect.CreateEffect(c)
-		extra_def_eff:SetType(EFFECT_TYPE_SINGLE)
-		extra_def_eff:SetCode(EFFECT_UPDATE_DEFENSE)
-		extra_def_eff:SetRange(LOCATION_MZONE)
-		extra_def_eff:SetValue(function (e)
-			return CS.GetBonusGrade(e:GetHandler()) * s.extra_def_multiplier
+		local extra_def_e = Effect.CreateEffect(c)
+		extra_def_e:SetType(EFFECT_TYPE_SINGLE)
+		extra_def_e:SetCode(EFFECT_UPDATE_DEFENSE)
+		extra_def_e:SetRange(LOCATION_MZONE)
+		extra_def_e:SetValue(function (e)
+			return CS.GetGrade(e:GetHandler()) * s.extra_def_multiplier
 		end)
-		extra_def_eff:SetReset(RESET_EVENT + RESETS_STANDARD_DISABLE)
-		c:RegisterEffect(extra_def_eff)
+		extra_def_e:SetReset(RESET_EVENT + RESETS_STANDARD_DISABLE)
+		c:RegisterEffect(extra_def_e)
 	end)
 
 	c:RegisterEffect(e1)

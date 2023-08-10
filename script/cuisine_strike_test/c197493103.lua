@@ -21,10 +21,10 @@ function s.initial_effect(c)
 			if #tg > 0 then
 				-- select one of dishes to return to deck
 				local tc = tg:Select(tp, 1, 1, false, nil):GetFirst()
-				if tc and Duel.SendtoDeck(tc, tp, 0, REASON_EFFECT) > 0 and Duel.GetLocationCount(tp, LOCATION_SZONE) > 0 and Duel.SelectYesNo(tp, aux.Stringid(id, 0)) then
+				if tc and Duel.SendtoDeck(tc, nil, SEQ_DECKTOP, REASON_EFFECT) > 0 and Duel.GetLocationCount(tp, LOCATION_SZONE) > 0 and Duel.SelectYesNo(tp, aux.Stringid(id, 0)) then
 					Duel.BreakEffect()
 					-- set one matching ingredients from trash
-					local tc2 = Duel.SelectMatchingCard(tp, s.ingredient_set_filter, tp, LOCATION_GRAVE, 0, 1, 1, nil):GetFirst()
+					local tc2 = Duel.SelectMatchingCard(tp, s.ingredient_set_filter, tp, LOCATION_GRAVE, 0, 1, 1, nil, e:GetHandler()):GetFirst()
 					if tc2 then
 						Duel.MoveToField(tc2, tp, tp, LOCATION_SZONE, POS_FACEUP, true)
 					end
@@ -40,6 +40,7 @@ function s.destroyed_card_filter(c, tp)
 	return CS.IsDishCard(c) and c:IsControler(tp)
 end
 
-function s.ingredient_set_filter(c)
-	return CS.IsIngredientCard(c) and CS.GetGrade(c) <= 2
+function s.ingredient_set_filter(c, ec)
+	local grade = CS.GetGrade(c)
+	return CS.IsIngredientCard(c) and grade <= 2 and grade <= CS.GetGrade(ec)
 end

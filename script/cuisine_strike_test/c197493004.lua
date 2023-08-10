@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	CS.InitBonusStatEffects(c, 0, 200)
 
 	-- cook summon procedures
-	Fusion.AddProcMix(c, true, true, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_MEAT), aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_EGG))
+	Fusion.AddProcMix(c, true, true, CS.CARD_BACON_SQUIRE, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_EGG))
 
 	local pow_boost_eff = Effect.CreateEffect(c)
 	pow_boost_eff:SetType(EFFECT_TYPE_FIELD)
