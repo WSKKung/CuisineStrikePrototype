@@ -10,8 +10,8 @@ s.damage_amount = 100
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
-	
-	-- heal hp
+
+	-- damage
 	local dmg_e = Effect.CreateEffect(c)
 	dmg_e:SetCategory(CATEGORY_DEFCHANGE)
 	dmg_e:SetType(EFFECT_TYPE_IGNITION)
