@@ -6,11 +6,12 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
+s.extra_def_min_def = 500
 s.extra_def_multiplier = 100
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
-	CS.InitBonusStatEffects(c, 0, 200)
+	CS.InitBonusStatEffects(c, 0, 100)
 
 	-- cook summon procedures
 	Fusion.AddProcMix(c, true, true, CS.CARD_BUN_GARDNA, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_MEAT))
@@ -21,11 +22,17 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(s.condition)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 
+end
+
+--- @type ConditionFunction
+function s.condition(e, tp, eg, ep, ev, re, r, rp)
+	return e:GetHandler():GetDefense() <= s.extra_def_min_def
 end
 
 --- @type CostFunction
