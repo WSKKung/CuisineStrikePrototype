@@ -21,28 +21,33 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-
-	e1:SetCost(function (e, tp, eg, ep, ev, re, r, rp, chk)
-		if chk==0 then return Duel.GetFieldGroupCount(tp, LOCATION_HAND, 0) > 0 end
-		Duel.DiscardHand(tp, aux.TRUE, 1, 1, REASON_COST, nil)
-	end)
-
-	e1:SetTarget(function(e, tp, eg, ep, ev, re, r, rp, chk)
-		if chk==0 then return Duel.IsExistingMatchingCard(s.filter, tp, 0, LOCATION_MZONE, 1, nil) end
-	end)
-
-	e1:SetOperation(function(e, tp, eg, ep, ev, re, r, rp)
-		local g = Duel.GetMatchingGroup(s.filter, tp, 0, LOCATION_MZONE, nil)
-		if #g > 0 then
-			g:ForEach(function (tc)
-				CS.Damage(tc, s.aoe_damage_amount)
-			end)
-		end
-	end)
-
+	e1:SetCost(s.cost)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
 
 function s.filter(c)
 	return CS.IsDishCard(c)
+end
+
+--- @type CostFunction
+function s.cost(e, tp, eg, ep, ev, re, r, rp, chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp, LOCATION_HAND, 0) > 0 end
+	Duel.DiscardHand(tp, aux.TRUE, 1, 1, REASON_COST, nil)
+end
+
+--- @type TargetFunction
+function s.target(e, tp, eg, ep, ev, re, r, rp, chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter, tp, 0, LOCATION_MZONE, 1, nil) end
+end
+
+--- @type OperationFunction
+function s.operation(e, tp, eg, ep, ev, re, r, rp)
+	local g = Duel.GetMatchingGroup(s.filter, tp, 0, LOCATION_MZONE, nil)
+	if #g > 0 then
+		g:ForEach(function (tc)
+			CS.Damage(tc, s.aoe_damage_amount)
+		end)
+	end
 end

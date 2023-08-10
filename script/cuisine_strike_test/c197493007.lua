@@ -22,9 +22,7 @@ function s.initial_effect(c)
 	str_boost_e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	str_boost_e:SetRange(LOCATION_SZONE)
 	str_boost_e:SetTargetRange(LOCATION_MZONE, 0)
-	str_boost_e:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
-		return CS.GetGrade(e:GetHandler()) >= s.stat_boost_min_grade
-	end)
+	str_boost_e:SetCondition(s.condition)
 	str_boost_e:SetValue(s.stat_boost_amount)
 	c:RegisterEffect(str_boost_e)
 
@@ -39,4 +37,9 @@ end
 ---@returns boolean
 function s.material_filter(c)
 	return c:IsRace(CS.CLASS_MEAT)
+end
+
+--- @type ConditionFunction
+function s.condition(e, tp, eg, ep, ev, re, r, rp, ...)
+	return CS.GetGrade(e:GetHandler()) >= s.stat_boost_min_grade
 end

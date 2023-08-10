@@ -18,12 +18,14 @@ function s.initial_effect(c)
 	damage_reduc_e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	damage_reduc_e:SetRange(LOCATION_SZONE)
 	damage_reduc_e:SetTargetRange(1, 0)
-	damage_reduc_e:SetValue(function (e, re, val, r, rp, rc)
-		if val > s.damage_reduc_amount then
-			return val - s.damage_reduc_amount
-		else
-			return 0
-		end
-	end)
+	damage_reduc_e:SetValue(s.value)
 	c:RegisterEffect(damage_reduc_e)
+end
+
+function s.value(e, re, val, r, rp, rc)
+	if val > s.damage_reduc_amount then
+		return val - s.damage_reduc_amount
+	else
+		return 0
+	end
 end

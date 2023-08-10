@@ -6,32 +6,35 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-function s.initial_effect(c)
-	CS.InitCommonEffects(c)
-
-	local e1 = CS.CreateActionEffect(c, {
-		type = "trigger",
-		code = EVENT_DESTROY,
-		properties = EFFECT_FLAG_DAMAGE_STEP,
-		condition = function (e, tp, eg, ep, ev, re, r, rp)
-			return eg and eg:IsExists(s.destroyed_card_filter, 1, nil, tp)
-		end,
-		operation = function (e, tp, eg, ep, ev, re, r, rp)
-			local tg = eg:Filter(s.destroyed_card_filter, nil, tp)
-			if #tg > 0 then
-				-- select one of dishes to return to deck
-				local tc = tg:Select(tp, 1, 1, false, nil):GetFirst()
-				if tc and Duel.SendtoDeck(tc, nil, SEQ_DECKTOP, REASON_EFFECT) > 0 and Duel.GetLocationCount(tp, LOCATION_SZONE) > 0 and Duel.SelectYesNo(tp, aux.Stringid(id, 0)) then
-					Duel.BreakEffect()
-					-- set one matching ingredients from trash
-					local tc2 = Duel.SelectMatchingCard(tp, s.ingredient_set_filter, tp, LOCATION_GRAVE, 0, 1, 1, nil, e:GetHandler()):GetFirst()
-					if tc2 then
-						Duel.MoveToField(tc2, tp, tp, LOCATION_SZONE, POS_FACEUP, true)
-					end
+--- @type ActionEffectOptions
+s.action_effect_options = {
+	type = "trigger",
+	code = EVENT_DESTROY,
+	properties = EFFECT_FLAG_DAMAGE_STEP,
+	condition = function (e, tp, eg, ep, ev, re, r, rp)
+		return eg and eg:IsExists(s.destroyed_card_filter, 1, nil, tp)
+	end,
+	operation = function (e, tp, eg, ep, ev, re, r, rp)
+		local tg = eg:Filter(s.destroyed_card_filter, nil, tp)
+		if #tg > 0 then
+			-- select one of dishes to return to deck
+			local tc = tg:Select(tp, 1, 1, false, nil):GetFirst()
+			if tc and Duel.SendtoDeck(tc, nil, SEQ_DECKTOP, REASON_EFFECT) > 0 and Duel.GetLocationCount(tp, LOCATION_SZONE) > 0 and Duel.SelectYesNo(tp, aux.Stringid(id, 0)) then
+				Duel.BreakEffect()
+				-- set one matching ingredients from trash
+				local tc2 = Duel.SelectMatchingCard(tp, s.ingredient_set_filter, tp, LOCATION_GRAVE, 0, 1, 1, nil, e:GetHandler()):GetFirst()
+				if tc2 then
+					Duel.MoveToField(tc2, tp, tp, LOCATION_SZONE, POS_FACEUP, true)
 				end
 			end
 		end
-	})
+	end
+}
+
+function s.initial_effect(c)
+	CS.InitCommonEffects(c)
+
+	local e1 = CS.CreateActionEffect(c, s.action_effect_options)
 	c:RegisterEffect(e1)
 
 end

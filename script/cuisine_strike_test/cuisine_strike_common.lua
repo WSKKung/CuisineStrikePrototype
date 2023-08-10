@@ -475,9 +475,11 @@ end
 
 --- @alias ActionEffectType "trigger" | "active"
 
+--- @alias ActionEffectOptions {type: ActionEffectType, code: EffectCode?, properties: integer?, cost: CostFunction?, condition: ConditionFunction?, target: TargetFunction?, operation: OperationFunction?}
+
 --- Create activation effect for action card (c Card)
 --- @param c Card
---- @param params {type: ActionEffectType, code: EffectCode?, properties: integer?, cost: CostFunction?, condition: ConditionFunction?, target: TargetFunction?, operation: OperationFunction?}
+--- @param params ActionEffectOptions
 --- @return Effect
 function CS.CreateActionEffect(c, params)
 

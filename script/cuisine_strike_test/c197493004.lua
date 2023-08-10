@@ -21,10 +21,11 @@ function s.initial_effect(c)
 	pow_boost_eff:SetRange(LOCATION_MZONE)
 	pow_boost_eff:SetTargetRange(LOCATION_MZONE, 0)
 	pow_boost_eff:SetTarget(aux.TRUE)
-	pow_boost_eff:SetValue(function (e, c)
-		return CS.GetBonusGrade(e:GetHandler()) * s.power_boost_multiplier
-	end)
+	pow_boost_eff:SetValue(s.value)
 	c:RegisterEffect(pow_boost_eff)
 
+end
 
+function s.value(e, c)
+	return CS.GetBonusGrade(e:GetHandler()) * s.power_boost_multiplier
 end
