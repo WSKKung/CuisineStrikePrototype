@@ -44,6 +44,30 @@ CS.EFFECT_UPDATE_ARMOR_VALUE = EVENT_CUSTOM + 19749301
 -- game rule constants
 CS.MAXIMUM_PLAYER_HP = 3000
 
+local function initial_effect()
+	--force summon in Attack Position
+	local force_attack_pos_e = Effect.GlobalEffect()
+	force_attack_pos_e:SetType(EFFECT_TYPE_FIELD)
+	force_attack_pos_e:SetCode(EFFECT_FORCE_SPSUMMON_POSITION)
+	force_attack_pos_e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	force_attack_pos_e:SetTargetRange(1, 1)
+	force_attack_pos_e:SetTarget(
+		---comment
+		---@param e Effect
+		---@param c Card
+		---@param sump Player
+		---@param sumtype SummonType
+		---@param sumpos BattlePosition
+		---@param targetp Player
+		---@return boolean
+		function (e, c, sump, sumtype, sumpos, targetp)
+			return c:IsSetCard(CS.SERIES_CUISINE_STRIKE)
+		end)
+	force_attack_pos_e:SetValue(POS_FACEUP_ATTACK)
+	Duel.RegisterEffect(force_attack_pos_e, 0)
+end
+initial_effect()
+
 --- 
 --- @param c Card
 --- @return integer 
