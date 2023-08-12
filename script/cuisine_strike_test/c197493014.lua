@@ -8,6 +8,8 @@ Duel.LoadScript("cuisine_strike_common.lua")
 
 s.hp_cost = 400
 s.damage_amount = 400
+s.burn_min_grade_amount = 4
+s.burn_amount = 400
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
@@ -49,5 +51,8 @@ function s.operation(e, tp, eg, ep, ev, re, r, rp)
 	local tc = Duel.SelectMatchingCard(tp, s.filter, tp, 0, LOCATION_MZONE, 1, 1, nil):GetFirst()
 	if tc then
 		CS.Damage(tc, s.damage_amount, REASON_EFFECT, c, tp)
+		if CS.GetGrade(c) >= s.burn_min_grade_amount then
+			Duel.Damage(1-tp, s.burn_amount, REASON_EFFECT)
+		end
 	end
 end
