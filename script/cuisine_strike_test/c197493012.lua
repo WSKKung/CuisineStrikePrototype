@@ -8,7 +8,7 @@ Duel.LoadScript("cuisine_strike_common.lua")
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
-	CS.InitBonusStatEffects(c, 200, 0)
+	CS.InitBonusStatEffects(c, 100, 100)
 
 	-- cook summon procedures
 	Fusion.AddProcMix(c, true, true, CS.CARD_TOMATOAD, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_PASTA), aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_MEAT))

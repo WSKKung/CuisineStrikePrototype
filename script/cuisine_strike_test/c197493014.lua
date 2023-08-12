@@ -11,7 +11,7 @@ s.damage_amount = 400
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
-	CS.InitBonusStatEffects(c, 200, 0)
+	CS.InitBonusStatEffects(c, 100, 100)
 
 	-- cook summon procedures
 	Fusion.AddProcMixRep(c, true, true, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_CHEESE), 1, 2, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_BREAD))
