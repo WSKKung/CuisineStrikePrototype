@@ -11,9 +11,6 @@ s.damage_reduc_amount = 200
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 
-	-- cook summon procedures
-	Fusion.AddProcMix(c, true, true, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_MEAT), aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_EGG))
-
 	-- damage reduction
 	local damage_reduc_e = Effect.CreateEffect(c)
 	damage_reduc_e:SetType(EFFECT_TYPE_FIELD)
