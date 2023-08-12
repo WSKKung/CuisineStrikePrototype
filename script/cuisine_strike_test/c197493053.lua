@@ -11,15 +11,15 @@ s.str_gain_amount = 100
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 
-	-- damage reduction
-	local def_gain_e = Effect.CreateEffect(c)
-	def_gain_e:SetType(EFFECT_TYPE_IGNITION)
-	def_gain_e:SetCategory(CATEGORY_ATKCHANGE)
-	def_gain_e:SetRange(LOCATION_SZONE)
-	def_gain_e:SetTarget(s.target)
-	def_gain_e:SetOperation(s.operation)
-	def_gain_e:SetCountLimit(1)
-	c:RegisterEffect(def_gain_e)
+	-- buff str
+	local str_gain_e = Effect.CreateEffect(c)
+	str_gain_e:SetType(EFFECT_TYPE_IGNITION)
+	str_gain_e:SetCategory(CATEGORY_ATKCHANGE)
+	str_gain_e:SetRange(LOCATION_SZONE)
+	str_gain_e:SetTarget(s.target)
+	str_gain_e:SetOperation(s.operation)
+	str_gain_e:SetCountLimit(1)
+	c:RegisterEffect(str_gain_e)
 end
 
 --- @type CardFilterFunction
