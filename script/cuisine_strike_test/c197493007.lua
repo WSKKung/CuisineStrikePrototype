@@ -31,7 +31,7 @@ end
 ---@param c Card
 ---@returns boolean
 function s.material_filter(c)
-	return c:IsRace(CS.CLASS_MEAT)
+	return c:IsRace(CS.CLASS_MEAT) and not CS.IsDishCard(c)
 end
 
 --- @type ConditionFunction

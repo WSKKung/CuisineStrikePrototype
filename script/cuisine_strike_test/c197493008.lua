@@ -30,7 +30,7 @@ end
 
 ---@type CardFilterFunction
 function s.material_filter(c)
-	return c:IsRace(CS.CLASS_EGG)
+	return c:IsRace(CS.CLASS_EGG) and not CS.IsDishCard(c)
 end
 
 --- @type ConditionFunction
