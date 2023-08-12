@@ -47,6 +47,27 @@ CS.MAXIMUM_PLAYER_HP = 3000
 -- initialize global effects
 local function initial_effect()
 
+	--disallow position change
+	local cannot_change_pos_e = Effect.GlobalEffect()
+	cannot_change_pos_e:SetType(EFFECT_TYPE_FIELD)
+	cannot_change_pos_e:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+	cannot_change_pos_e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	cannot_change_pos_e:SetTargetRange(1, 1)
+	cannot_change_pos_e:SetTarget(
+		---apply to all our custom cards
+		---@param e Effect
+		---@param c Card
+		---@param sump Player
+		---@param sumtype SummonType
+		---@param sumpos BattlePosition
+		---@param targetp Player
+		---@return boolean
+		function (e, c, sump, sumtype, sumpos, targetp)
+			return c:IsSetCard(CS.SERIES_CUISINE_STRIKE)
+		end)
+	cannot_change_pos_e:SetValue(true)
+	Duel.RegisterEffect(cannot_change_pos_e, 0)
+
 	--force summon in Attack Position
 	local force_attack_pos_e = Effect.GlobalEffect()
 	force_attack_pos_e:SetType(EFFECT_TYPE_FIELD)
