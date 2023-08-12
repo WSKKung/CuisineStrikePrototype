@@ -17,6 +17,7 @@ function s.initial_effect(c)
 	Fusion.AddProcMixRep(c, true, true, s.material_filter, 1, 2)
 
 	local str_boost_e = Effect.CreateEffect(c)
+	str_boost_e:SetDescription(aux.Stringid(id, 0))
 	str_boost_e:SetType(EFFECT_TYPE_IGNITION)
 	str_boost_e:SetRange(LOCATION_MZONE)
 	str_boost_e:SetCondition(s.condition)
