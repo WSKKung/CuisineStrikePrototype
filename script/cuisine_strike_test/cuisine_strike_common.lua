@@ -112,29 +112,6 @@ local function initial_effect()
 	indestructible_in_battle_e:SetValue(true)
 	Duel.RegisterEffect(indestructible_in_battle_e, 0)
 
-	--prevent battle damage
-	local no_battle_damage_eff = Effect.GlobalEffect()
-	no_battle_damage_eff:SetType(EFFECT_TYPE_FIELD)
-	no_battle_damage_eff:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	no_battle_damage_eff:SetTargetRange(1, 1)
-	no_battle_damage_eff:SetValue(
-		---comment
-		---@param e Effect
-		---@param c Card
-		---@return boolean
-		function (e, c)
-			if not c or not c:IsSetCard(CS.SERIES_CUISINE_STRIKE) then return false end
-			for _, p_eff in ipairs{c:GetCardEffect(EFFECT_PIERCE)} do
-				local pierce_condition = p_eff:GetCondition()
-				if not pierce_condition or pierce_condition(p_eff) then
-					return false
-				end
-			end
-			return true
-		end)
-	Duel.RegisterEffect(no_battle_damage_eff, 0)
-
 	-- battle
 	local battle_e = Effect.GlobalEffect()
 	battle_e:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
@@ -470,6 +447,31 @@ function CuisineStrike.InitializeDishEffects(c)
 	)
 	cook_proc_eff:SetValue(SUMMON_TYPE_FUSION)
 	c:RegisterEffect(cook_proc_eff)
+
+	--prevent battle damage
+	local no_battle_damage_eff = Effect.CreateEffect(c)
+	no_battle_damage_eff:SetType(EFFECT_TYPE_SINGLE)
+	no_battle_damage_eff:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET + EFFECT_FLAG_DAMAGE_STEP)
+	no_battle_damage_eff:SetRange(LOCATION_MZONE)
+	no_battle_damage_eff:SetTargetRange(1, 0)
+	no_battle_damage_eff:SetValue(
+		---comment
+		---@param e Effect
+		---@param bc Card
+		---@return boolean
+		function (e, bc)
+			local c = e:GetHandler()
+			if not bc or not bc:IsSetCard(CS.SERIES_CUISINE_STRIKE) then return false end
+			for _, p_eff in ipairs{bc:GetCardEffect(EFFECT_PIERCE)} do
+				local pierce_condition = p_eff:GetCondition()
+				if not pierce_condition or pierce_condition(p_eff) then
+					return false
+				end
+			end
+			return true
+		end)
+	c:RegisterEffect(no_battle_damage_eff)
 
 	-- place into spell/trap zone if its an ingredient
 	if (CS.IsIngredientCard(c)) then
