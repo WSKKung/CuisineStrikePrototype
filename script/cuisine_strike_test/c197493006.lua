@@ -6,11 +6,12 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
+s.armor_min_grade = 3
 s.damage_reduc_amount = 200
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
-	CS.InitBonusStatEffects(c, 100, 100)
+	CS.InitBonusStatEffects(c, 100, 0)
 
 	-- cook summon procedures
 	Fusion.AddProcMixRep(c, true, true, s.material_filter, 1, 2)
@@ -20,6 +21,7 @@ function s.initial_effect(c)
 	shield_e:SetType(EFFECT_TYPE_SINGLE)
 	shield_e:SetRange(LOCATION_MZONE)
 	shield_e:SetCode(CS.EFFECT_UPDATE_ARMOR_VALUE)
+	shield_e:SetCondition(s.armor_condition)
 	shield_e:SetValue(100)
 	c:RegisterEffect(shield_e)
 
@@ -47,4 +49,9 @@ function s.damage_reduc_value(e, re, val, r, rp, rc)
 	else
 		return 0
 	end
+end
+
+--- @type ConditionFunction
+function s.armor_condition(e, tp, eg, ep, ev, re, r, rp)
+	return CS.GetGrade(e:GetHandler()) >= s.armor_min_grade
 end
