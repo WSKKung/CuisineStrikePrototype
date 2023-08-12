@@ -26,10 +26,6 @@ function s.initial_effect(c)
 	str_boost_e:SetValue(s.stat_boost_amount)
 	c:RegisterEffect(str_boost_e)
 
-	local def_boost_e = str_boost_e:Clone()
-	def_boost_e:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(def_boost_e)
-
 end
 
 ---
