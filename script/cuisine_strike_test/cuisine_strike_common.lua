@@ -629,6 +629,8 @@ function CS.ActionCardActiveConditionFunction(additional_condition)
 		if Duel.GetCurrentChain() > 0 then return false end
 		-- active effect can only be activated on their own turn
 		if Duel.GetTurnPlayer() ~= tp then return false end
+		-- must activate on main phase 1
+		if Duel.GetCurrentPhase() ~= PHASE_MAIN1 then return false end
 		return not additional_condition or additional_condition(e, tp, eg, ep, ev, re, r, rp, ...)
 	end
 end
