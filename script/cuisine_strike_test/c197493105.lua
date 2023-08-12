@@ -30,5 +30,5 @@ function s.initial_effect(c)
 end
 
 function s.target_filter(c)
-	return CS.IsDishCard(c)
+	return CS.IsDishCard(c) and c:CanGetPiercingRush()
 end
