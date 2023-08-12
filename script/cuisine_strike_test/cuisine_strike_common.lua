@@ -44,7 +44,9 @@ CS.EFFECT_UPDATE_ARMOR_VALUE = EVENT_CUSTOM + 19749301
 -- game rule constants
 CS.MAXIMUM_PLAYER_HP = 3000
 
+-- initialize global effects
 local function initial_effect()
+
 	--force summon in Attack Position
 	local force_attack_pos_e = Effect.GlobalEffect()
 	force_attack_pos_e:SetType(EFFECT_TYPE_FIELD)
@@ -52,7 +54,7 @@ local function initial_effect()
 	force_attack_pos_e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	force_attack_pos_e:SetTargetRange(1, 1)
 	force_attack_pos_e:SetTarget(
-		---comment
+		---apply to all our custom cards
 		---@param e Effect
 		---@param c Card
 		---@param sump Player
@@ -65,8 +67,101 @@ local function initial_effect()
 		end)
 	force_attack_pos_e:SetValue(POS_FACEUP_ATTACK)
 	Duel.RegisterEffect(force_attack_pos_e, 0)
+
+	-- prevent destruction by battle
+	-- will use hp system to destroy in battle instead
+	local indestructible_in_battle_e = Effect.GlobalEffect()
+	indestructible_in_battle_e:SetType(EFFECT_TYPE_FIELD)
+	indestructible_in_battle_e:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	indestructible_in_battle_e:SetTargetRange(LOCATION_MZONE, LOCATION_MZONE)
+	indestructible_in_battle_e:SetTarget(
+		---apply to all our custom cards
+		---@param e Effect
+		---@param c Card
+		---@return boolean
+		function (e, c)
+			return c:IsSetCard(CS.SERIES_CUISINE_STRIKE)
+		end)
+	indestructible_in_battle_e:SetValue(true)
+	Duel.RegisterEffect(indestructible_in_battle_e, 0)
+
+	--prevent battle damage
+	local no_battle_damage_eff = Effect.GlobalEffect()
+	no_battle_damage_eff:SetType(EFFECT_TYPE_FIELD)
+	no_battle_damage_eff:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	no_battle_damage_eff:SetTargetRange(1, 1)
+	no_battle_damage_eff:SetValue(
+		---comment
+		---@param e Effect
+		---@param c Card
+		---@return boolean
+		function (e, c)
+			if not c or not c:IsSetCard(CS.SERIES_CUISINE_STRIKE) then return false end
+			for _, p_eff in ipairs{c:GetCardEffect(EFFECT_PIERCE)} do
+				local pierce_condition = p_eff:GetCondition()
+				if not pierce_condition or pierce_condition(p_eff) then
+					return false
+				end
+			end
+			return true
+		end)
+	Duel.RegisterEffect(no_battle_damage_eff, 0)
+
+	-- battle
+	local battle_e = Effect.GlobalEffect()
+	battle_e:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+	battle_e:SetCode(EVENT_BATTLED)
+	battle_e:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
+		local ac, bc = Duel.GetBattleMonster(tp)
+		return ac and CS.IsCuisineStrikeCard(ac) and bc and CS.IsCuisineStrikeCard(bc)
+	end)
+	battle_e:SetTarget(function (e, tp, eg, ep, ev, re, r, rp, chk, ...)
+		if chk==0 then return true end
+	end)
+	battle_e:SetOperation(function (e, tp, eg, ep, ev, re, r, rp, ...)
+		local ac, bc = Duel.GetBattleMonster(tp)
+		CS.Damage(ac, bc:GetAttack(), REASON_BATTLE, bc, 1-tp)
+		CS.Damage(bc, ac:GetAttack(), REASON_BATTLE, ac, tp)
+	end)
+	Duel.RegisterEffect(battle_e, 0)
+
+	-- handle hp reduction & destruction
+	local hp_sim_e = Effect.GlobalEffect()
+	hp_sim_e:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+	hp_sim_e:SetCode(CS.EVENT_DISH_TAKEN_DAMAGE)
+	hp_sim_e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	hp_sim_e:SetTargetRange(1, 1)
+	hp_sim_e:SetCondition(function (e, tp, eg, ep, ev, re, r, rp, ...)
+		local ec = eg:GetFirst()
+		return (ec ~= nil) and ec:IsSetCard(CS.SERIES_CUISINE_STRIKE)
+	end)
+	hp_sim_e:SetOperation(function (e, tp, eg, ep, ev, re, r, rp, ...)
+		local ec = eg:GetFirst()
+		if ec then
+			-- calculate armor amount of the target card
+			for _, armored_eff in ipairs{ec:GetCardEffect(CS.EFFECT_UPDATE_ARMOR_VALUE)} do
+				local armor_condition = armored_eff:GetCondition()
+				if not armor_condition or armor_condition(armored_eff, ec:GetOwner(), nil, ec:GetOwner(), ev, e, r, rp) then
+					local armor_val = armored_eff:GetValue() or 0
+					if type(armor_val) == "function" then
+						ev = ev - armor_val(armored_eff)
+					else
+						ev = ev - armor_val
+					end
+				end
+			end
+
+			ec:UpdateDefense(-ev)
+			if ec:GetDefense() == 0 then
+				Duel.Destroy(ec, r, nil, rp)
+			end
+		end
+	end)
+	Duel.RegisterEffect(hp_sim_e, 0)
 end
 initial_effect()
+
 
 --- 
 --- @param c Card
@@ -103,6 +198,12 @@ function CuisineStrike.IsPlayerAbleToHeal(player)
 	return Duel.GetLP(player) < CuisineStrike.MAXIMUM_PLAYER_HP
 end
 
+--- 
+--- @param c Card
+--- @return boolean 
+function CS.IsCuisineStrikeCard(c)
+	return c:IsSetCard(CS.SERIES_CUISINE_STRIKE)
+end
 
 --- 
 --- @param c Card
@@ -179,42 +280,11 @@ end
 --- @param reason Reason? default to 0
 --- @param reason_card Card? default to the card taken damage itself
 --- @param reason_player Player? default to owner of reason_card
---- @return integer The amount of damage dealt
 function CuisineStrike.Damage(c, amount, reason, reason_card, reason_player)
-
 	reason = reason or 0
 	reason_card = reason_card or c
 	reason_player = reason_player or c:GetOwner()
-
-	local cur_health = c:GetDefense()
-
-	-- apply armor effect of the target card
-	for _, armored_eff in ipairs{c:GetCardEffect(CS.EFFECT_UPDATE_ARMOR_VALUE)} do
-		local armor_condition = armored_eff:GetCondition()
-		if not armor_condition or armor_condition(armored_eff, c:GetOwner(), Group.FromCards(reason_card), c:GetOwner(), amount, nil, reason, reason_player) then
-			local armor_val = armored_eff:GetValue() or 0
-			if type(armor_val) == "function" then
-				amount = amount - armor_val(armored_eff)
-			else
-				amount = amount - armor_val
-			end
-		end
-	end
-
-	if amount > cur_health then amount = cur_health end
-
-	if amount > 0 then
-		local e1 = Effect.CreateEffect(reason_card)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetValue(amount)
-		e1:SetCategory(CATEGORY_DEFCHANGE)
-		e1:SetCode(EFFECT_UPDATE_DEFENSE)
-		e1:SetReset(RESET_EVENT + RESETS_STANDARD_DISABLE)
-		e1:SetValue(-amount)
-		c:RegisterEffect(e1)
-	end
-
-	return amount
+	Duel.RaiseEvent(c, CS.EVENT_DISH_TAKEN_DAMAGE, nil, reason, reason_player, c:GetOwner(), amount)
 end
 
 ---Initialize common effects to a card appropiate to their card type value configured in the database as following\
@@ -353,7 +423,6 @@ function CuisineStrike.InitializeDishEffects(c)
 	c:RegisterEffect(cook_proc_eff)
 
 	-- health simulation effs
-
 	-- lower def after damage calculation
 	local hp_sim_eff=Effect.CreateEffect(c)
 	hp_sim_eff:SetType(EFFECT_TYPE_SINGLE + EFFECT_TYPE_TRIGGER_F)
@@ -381,43 +450,7 @@ function CuisineStrike.InitializeDishEffects(c)
 		CS.Damage(c, damage, REASON_BATTLE, c:GetBattleTarget(), 1-tp)
 	end)
 
-	c:RegisterEffect(hp_sim_eff)
-
-	--destroy if hp reaches zero
-	local destroy_when_no_hp_eff = Effect.CreateEffect(c)
-	destroy_when_no_hp_eff:SetType(EFFECT_TYPE_SINGLE)
-	destroy_when_no_hp_eff:SetRange(LOCATION_MZONE)
-	destroy_when_no_hp_eff:SetCode(EFFECT_SELF_DESTROY)
-	destroy_when_no_hp_eff:SetCondition(function (e, tp, eg, ep, ev, re, r, rp)
-		return e:GetHandler():GetDefense() <= 0
-	end)
-	c:RegisterEffect(destroy_when_no_hp_eff)
-
-	-- prevent destruction by battle
-	-- will use hp system to destroy in battle instead
-	local indestructible_in_battle_eff = Effect.CreateEffect(c)
-	indestructible_in_battle_eff:SetType(EFFECT_TYPE_SINGLE)
-	indestructible_in_battle_eff:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	indestructible_in_battle_eff:SetValue(true)
-	c:RegisterEffect(indestructible_in_battle_eff)
-
-	--prevent battle damage
-	local no_battle_damage_eff=Effect.CreateEffect(c)
-	no_battle_damage_eff:SetType(EFFECT_TYPE_SINGLE)
-	no_battle_damage_eff:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	no_battle_damage_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	no_battle_damage_eff:SetTargetRange(1, 0)
-	no_battle_damage_eff:SetValue(function (e, tc, ...)
-		if not tc then return true end
-		for _, p_eff in ipairs{tc:GetCardEffect(EFFECT_PIERCE)} do
-			local pierce_condition = p_eff:GetCondition()
-			if not pierce_condition or pierce_condition(p_eff) then
-				return false
-			end
-		end
-		return true
-	end)
-	c:RegisterEffect(no_battle_damage_eff)
+	--c:RegisterEffect(hp_sim_eff)
 
 	-- place into spell/trap zone if its an ingredient
 	if (CS.IsIngredientCard(c)) then
