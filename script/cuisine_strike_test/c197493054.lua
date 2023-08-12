@@ -6,7 +6,7 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-s.def_gain_amount = 200
+s.str_gain_amount = 200
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	-- damage reduction
 	local def_gain_e = Effect.CreateEffect(c)
 	def_gain_e:SetType(EFFECT_TYPE_IGNITION)
-	def_gain_e:SetCategory(CATEGORY_DEFCHANGE)
+	def_gain_e:SetCategory(CATEGORY_ATKCHANGE)
 	def_gain_e:SetRange(LOCATION_SZONE)
 	def_gain_e:SetTarget(s.target)
 	def_gain_e:SetOperation(s.operation)
@@ -46,7 +46,7 @@ end
 function s.operation(e, tp, eg, ep, ev, re, r, rp)
 	local tc = Duel.SelectMatchingCard(tp, s.filter, tp, LOCATION_MZONE, 0, 1, 1, nil):GetFirst()
 	if tc then
-		if tc:UpdateDefense(s.def_gain_amount, RESET_EVENT + RESETS_STANDARD_DISABLE, e:GetHandler()) == 0 then return end
+		if tc:UpdateAttack(s.str_gain_amount, RESET_EVENT + RESETS_STANDARD_DISABLE, e:GetHandler()) == 0 then return end
 		if s.tohand_condition(e, tp, eg, ep, ev, re, r, rp) and Duel.SelectYesNo(tp, aux.Stringid(id, 0)) then
 			local tg2 = Duel.SelectMatchingCard(tp, s.tohand_filter, tp, LOCATION_GRAVE, 0, 1, 1, nil)
 			if #tg2 > 0 then
