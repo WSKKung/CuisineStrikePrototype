@@ -121,8 +121,10 @@ local function initial_effect()
 	end)
 	battle_e:SetOperation(function (e, tp, eg, ep, ev, re, r, rp, ...)
 		local ac, bc = Duel.GetBattleMonster(tp)
-		CS.Damage(ac, bc:GetAttack(), REASON_BATTLE, bc, 1-tp)
-		CS.Damage(bc, ac:GetAttack(), REASON_BATTLE, ac, tp)
+		local astr = ac:GetAttack()
+		local bstr = bc:GetAttack()
+		CS.Damage(ac, bstr, REASON_BATTLE, bc, 1-tp)
+		CS.Damage(bc, astr, REASON_BATTLE, ac, tp)
 	end)
 	Duel.RegisterEffect(battle_e, 0)
 
@@ -151,7 +153,10 @@ local function initial_effect()
 					end
 				end
 			end
-
+			local current_hp = ec:GetDefense()
+			-- cap damage because Card.UpdateDefense disallow operation entirely if the def would go below zero
+			if ev > current_hp then ev = current_hp end
+			
 			ec:UpdateDefense(-ev)
 			if ec:GetDefense() == 0 then
 				Duel.Destroy(ec, r, nil, rp)
@@ -159,6 +164,22 @@ local function initial_effect()
 		end
 	end)
 	Duel.RegisterEffect(hp_sim_e, 0)
+
+	-- disallow set action card
+	local cannot_set_eff = Effect.GlobalEffect()
+	cannot_set_eff:SetType(EFFECT_TYPE_FIELD)
+	cannot_set_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	cannot_set_eff:SetCode(EFFECT_CANNOT_SSET)
+	cannot_set_eff:SetTargetRange(1, 1)
+	cannot_set_eff:SetTarget(
+		--- @param e Effect
+		--- @param c Card
+		--- @return boolean
+		function (e, c)
+			return CS.IsCuisineStrikeCard(c) and CS.IsActionCard(c)
+		end)
+	Duel.RegisterEffect(cannot_set_eff, 0)
+
 end
 initial_effect()
 
@@ -422,36 +443,6 @@ function CuisineStrike.InitializeDishEffects(c)
 	cook_proc_eff:SetValue(SUMMON_TYPE_FUSION)
 	c:RegisterEffect(cook_proc_eff)
 
-	-- health simulation effs
-	-- lower def after damage calculation
-	local hp_sim_eff=Effect.CreateEffect(c)
-	hp_sim_eff:SetType(EFFECT_TYPE_SINGLE + EFFECT_TYPE_TRIGGER_F)
-	hp_sim_eff:SetCode(EVENT_BATTLED)
-	hp_sim_eff:SetRange(LOCATION_MZONE)
-
-	hp_sim_eff:SetCondition(function (e, tp, eg, ep, ev, re, r, rp)
-		local bc = e:GetHandler():GetBattleTarget()
-		return bc and bc:GetAttack() > 0
-	end)
-
-	hp_sim_eff:SetTarget(function (e, tp, eg, ep, ev, re, r, rp, chk)
-		if chk==0 then return true end
-		-- calculate received damage before applying to avoid battle target whose atk are modified leaves the field before applying damage to this card
-		local c = e:GetHandler()
-		local tc = c:GetBattleTarget()
-		local damage = tc:GetAttack()
-		e:SetLabel(damage)
-		
-	end)
-
-	hp_sim_eff:SetOperation(function (e, tp, eg, ep, ev, re, r, rp)
-		local c = e:GetHandler()
-		local damage = e:GetLabel()
-		CS.Damage(c, damage, REASON_BATTLE, c:GetBattleTarget(), 1-tp)
-	end)
-
-	--c:RegisterEffect(hp_sim_eff)
-
 	-- place into spell/trap zone if its an ingredient
 	if (CS.IsIngredientCard(c)) then
 		local set_backrow_eff = Effect.CreateEffect(c)
@@ -481,18 +472,6 @@ end
 ---@see CuisineStrike.CreateActionActivationEffect
 ---@param c Card
 function CuisineStrike.InitializeActionEffects(c)
-
-	local cannot_set_eff=Effect.CreateEffect(c)
-	cannot_set_eff:SetType(EFFECT_TYPE_FIELD)
-	cannot_set_eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	cannot_set_eff:SetCode(EFFECT_CANNOT_SSET)
-	cannot_set_eff:SetRange(LOCATION_HAND)
-	cannot_set_eff:SetTargetRange(1,0)
-	cannot_set_eff:SetTarget(function (e, c)
-		return c == e:GetHandler()
-	end)
-	c:RegisterEffect(cannot_set_eff)
-
 	local use_from_hand_eff = Effect.CreateEffect(c)
 	use_from_hand_eff:SetType(EFFECT_TYPE_SINGLE)
 	use_from_hand_eff:SetCode(EFFECT_TRAP_ACT_IN_HAND)
