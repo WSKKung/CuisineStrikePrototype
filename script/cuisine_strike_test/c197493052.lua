@@ -6,7 +6,7 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-s.def_boost_amount = 200
+s.damage_reduc_amount = 200
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
@@ -14,12 +14,21 @@ function s.initial_effect(c)
 	-- cook summon procedures
 	Fusion.AddProcMix(c, true, true, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_MEAT), aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_EGG))
 
-	local def_boost_e = Effect.CreateEffect(c)
-	def_boost_e:SetType(EFFECT_TYPE_FIELD)
-	def_boost_e:SetCode(EFFECT_UPDATE_DEFENSE)
-	def_boost_e:SetRange(LOCATION_SZONE)
-	def_boost_e:SetTargetRange(LOCATION_MZONE, 0)
-	def_boost_e:SetTarget(aux.TRUE)
-	def_boost_e:SetValue(s.def_boost_amount)
-	c:RegisterEffect(def_boost_e)
+	-- damage reduction
+	local damage_reduc_e = Effect.CreateEffect(c)
+	damage_reduc_e:SetType(EFFECT_TYPE_FIELD)
+	damage_reduc_e:SetCode(EFFECT_CHANGE_DAMAGE)
+	damage_reduc_e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	damage_reduc_e:SetRange(LOCATION_SZONE)
+	damage_reduc_e:SetTargetRange(1, 0)
+	damage_reduc_e:SetValue(s.value)
+	c:RegisterEffect(damage_reduc_e)
+end
+
+function s.value(e, re, val, r, rp, rc)
+	if val > s.damage_reduc_amount then
+		return val - s.damage_reduc_amount
+	else
+		return 0
+	end
 end
