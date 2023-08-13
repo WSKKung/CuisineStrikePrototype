@@ -6,7 +6,7 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-s.damage_amount = 100
+s.damage_amount = 300
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
@@ -17,6 +17,7 @@ function s.initial_effect(c)
 	dmg_e:SetType(EFFECT_TYPE_IGNITION)
 	dmg_e:SetRange(LOCATION_SZONE)
 	dmg_e:SetCountLimit(1)
+	dmg_e:SetCost(s.cost)
 	dmg_e:SetTarget(s.target)
 	dmg_e:SetOperation(s.operation)
 	c:RegisterEffect(dmg_e)
@@ -24,6 +25,13 @@ end
 
 function s.filter(c)
 	return CS.IsDishCard(c)
+end
+
+--- @type CostFunction
+function s.cost(e, tp, eg, ep, ev, re, r, rp, chk, ...)
+	local c = e:GetHandler()
+	if chk==0 then return c:IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(c, REASON_COST)
 end
 
 --- @type TargetFunction
