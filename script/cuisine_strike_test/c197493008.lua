@@ -6,9 +6,6 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-s.stat_boost_min_grade = 2
-s.stat_boost_amount = 100
-
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 	CS.InitBonusStatEffects(c, 100, 100)
@@ -31,11 +28,6 @@ end
 ---@type CardFilterFunction
 function s.material_filter(c)
 	return c:IsRace(CS.CLASS_EGG) and not CS.IsDishCard(c)
-end
-
---- @type ConditionFunction
-function s.condition(e, tp, eg, ep, ev, re, r, rp, ...)
-	return CS.GetGrade(e:GetHandler()) >= s.stat_boost_min_grade
 end
 
 ---@type CardFilterFunction
