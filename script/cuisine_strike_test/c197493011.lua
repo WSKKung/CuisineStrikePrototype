@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	CS.InitBonusStatEffects(c, 200, 0)
 
 	-- cook summon procedures
-	Fusion.AddProcMix(c, true, true, CS.CARD_TOMATOAD, CS.CARD_SUMMONING_CRUST, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_CHEESE))
+	Fusion.AddProcMix(c, true, true, CS.CARD_TOMATOAD, aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_BREAD), aux.FilterBoolFunctionEx(Card.IsRace, CS.CLASS_CHEESE))
 
 	-- gain atk
 	local e1 = Effect.CreateEffect(c)
