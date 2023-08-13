@@ -6,7 +6,8 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
-s.str_gain_amount = 100
+s.hp_cost = 100
+s.str_gain_amount = 300
 
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
@@ -17,6 +18,7 @@ function s.initial_effect(c)
 	str_gain_e:SetCategory(CATEGORY_ATKCHANGE)
 	str_gain_e:SetRange(LOCATION_SZONE)
 	str_gain_e:SetTarget(s.target)
+	str_gain_e:SetTarget(s.target)
 	str_gain_e:SetOperation(s.operation)
 	str_gain_e:SetCountLimit(1)
 	c:RegisterEffect(str_gain_e)
@@ -25,6 +27,12 @@ end
 --- @type CardFilterFunction
 function s.filter(c)
 	return CS.IsDishCard(c)
+end
+
+--- @type CostFunction
+function s.cost(e, tp, eg, ep, ev, re, r, rp, chk)
+	if chk==0 then return Duel.GetLP(tp) > s.hp_cost end
+	Duel.PayLPCost(tp, s.hp_cost)
 end
 
 --- @type TargetFunction
