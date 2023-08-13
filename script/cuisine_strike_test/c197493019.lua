@@ -34,5 +34,5 @@ end
 ---@param tc Card
 ---@return integer
 function s.value(e, tc)
-	return CS.GetGrade(e:GetHandler()) * 100
+	return -CS.GetGrade(e:GetHandler()) * 100
 end
