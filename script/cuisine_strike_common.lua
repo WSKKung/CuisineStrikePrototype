@@ -516,24 +516,26 @@ end
 function CS.InitBonusStatEffects(c, bonus_str, bonus_def)
 	if not CS.IsDishCard(c) then return end
 	if bonus_str > 0 then
+		local original_str = c:GetBaseAttack()
 		local bonus_str_eff = Effect.CreateEffect(c)
 		bonus_str_eff:SetType(EFFECT_TYPE_SINGLE)
+		bonus_str_eff:SetCode(EFFECT_SET_BASE_ATTACK)
 		bonus_str_eff:SetRange(LOCATION_MZONE)
-		bonus_str_eff:SetCategory(CATEGORY_ATKCHANGE)
-		bonus_str_eff:SetCode(EFFECT_UPDATE_ATTACK)
+		bonus_str_eff:SetProperty(EFFECT_FLAG_UNCOPYABLE + EFFECT_FLAG_CANNOT_DISABLE)
 		bonus_str_eff:SetValue(function (e)
-			return CS.GetBonusGrade(c) * bonus_str
+			return original_str + CS.GetBonusGrade(c) * bonus_str
 		end)
 		c:RegisterEffect(bonus_str_eff)
 	end
 	if bonus_def > 0 then
+		local original_def = c:GetBaseDefense()
 		local bonus_def_eff = Effect.CreateEffect(c)
 		bonus_def_eff:SetType(EFFECT_TYPE_SINGLE)
+		bonus_def_eff:SetCode(EFFECT_SET_BASE_DEFENSE)
 		bonus_def_eff:SetRange(LOCATION_MZONE)
-		bonus_def_eff:SetCategory(CATEGORY_DEFCHANGE)
-		bonus_def_eff:SetCode(EFFECT_UPDATE_DEFENSE)
+		bonus_def_eff:SetProperty(EFFECT_FLAG_UNCOPYABLE + EFFECT_FLAG_CANNOT_DISABLE)
 		bonus_def_eff:SetValue(function (e)
-			return CS.GetBonusGrade(c) * bonus_def
+			return original_def + CS.GetBonusGrade(c) * bonus_def
 		end)
 		c:RegisterEffect(bonus_def_eff)
 	end
