@@ -6,6 +6,8 @@ local s, id = GetID()
 
 Duel.LoadScript("cuisine_strike_common.lua")
 
+s.extra_piercing_min_hp = 1500
+
 function s.initial_effect(c)
 	CS.InitCommonEffects(c)
 	CS.InitBonusStatEffects(c, 200, 0)
@@ -48,4 +50,8 @@ function s.operation(e, tp, eg, ep, ev, re, r, rp)
 	local hp_cost = e:GetLabel()
 	local c = e:GetHandler()
 	c:UpdateAttack(hp_cost)
+
+	if Duel.GetLP(tp) <= s.extra_piercing_min_hp then
+		c:AddPiercing(RESET_EVENT + RESETS_STANDARD_DISABLE + RESET_PHASE + PHASE_END)
+	end
 end
