@@ -514,14 +514,97 @@ function Card.IsExactType(c, typ, sumc, sumtype, player) end
 function Card.IsExtraLinked(c) end
 function Card.IsFacedown(c) end
 function Card.IsFaceup(c) end
+function Card.IsFieldSpell(c) end
+function Card.IsForbidden(c) end
+function Card.IsFusionSummonableCard(c, sumtype) end
 
+---Checks if a Card (Card c) is a Gemini monster with its effect enabled.
+---@param c Card
+---@return boolean
+function Card.IsGeminiStatus(c) end
+
+---Checks whether the second card (Card c2) is a target of the first card (Card c1)
+---@param c1 Card
+---@param c2 Card
+---@return boolean
+function Card.IsHasCardTarget(c1, c2) end
+
+---Checks if a (Card c) has an effect with code (int code). Returns all the effects found with that code, or nil if the effect is not found. (int player), if provided, is used to check the effect's count limit
+---@param c Card
+---@param code EffectCode
+---@return boolean
 function Card.IsHasEffect(c, code) end
+
+function Card.IsImmuneToEffect(c, e) end
+function Card.IsInExtraMZone(c, tp) end
+
+---Checks if "c" has a Level equal to any of the levels passed as ...
+---@param c Card
+---@param ... integer
+---@return boolean
+function Card.IsLevel(c, ...) end
+
+---Checks if a card (Card c) has level equal or above the specified number (int level), will return false if the card has no level.
+---@param c Card
+---@param level integer
+---@return boolean
+function Card.IsLevelAbove(c, level) end
+
+---Checks if a card (Card c) has level equal or below the specified number (int level), will return false if the card has no level.
+---@param c Card
+---@param level integer
+---@return boolean
+function Card.IsLevelBelow(c, level) end
+
+function Card.IsLink(c, lk) end
+function Card.IsLinkAbove(c, link_rating) end
+function Card.IsLinkBelow(c, link_rating) end
+function Card.IsLinkCode(c, ...) end
+function Card.IsLinked(c) end
+function Card.IsLinkMarker(c, markers) end
+function Card.IsLinkMonster(c) end
+function Card.IsLinkSetCard(c, setname) end
+function Card.IsLinkSpell(c) end
+function Card.IsLinkSummonable(c, must_use, mg, min, max) end
 
 ---Checks if a card (Card c) is located on the specified location (int location)
 ---@param c any
 ---@param location any
 ---@return boolean
 function Card.IsLocation(c, location) end
+
+function Card.IsMaximumMode(c) end
+function Card.IsMaximumModeCenter(c) end
+function Card.IsMaximumModeLeft(c) end
+function Card.IsMaximumModeRight(c) end
+function Card.IsMaximumModeSide(c) end
+function Card.IsMonster(c) end
+
+function Card.IsMSetable(c, ignore_count, e, min) end
+function Card.IsNegatable(c) end
+function Card.IsNegatableMonster(c) end
+function Card.IsNegatableSpellTrap(c) end
+function Card.IsNonEffectMonster(c) end
+function Card.IsNormalSpell(c) end
+function Card.IsNormalTrap(c) end
+function Card.IsNotMaximumModeSide(c) end
+function Card.IsNotTuner(c) end
+function Card.IsOddScale(c) end
+function Card.IsOnField(c) end
+function Card.IsOriginalAttribute(c, val) end
+function Card.IsOriginalCode(c, cd) end
+function Card.IsOriginalCodeRule(c, cd) end
+function Card.IsOriginalRace(c, val) end
+function Card.IsOriginalSetCard(c, setname) end
+function Card.IsOriginalType(c, val) end
+function Card.IsPosition(c, pos) end
+function Card.IsPreviousControler(c, tp) end
+function Card.IsPreviousLocation(c, location) end
+function Card.IsPreviousPosition(c, pos) end
+function Card.IsPreviousSetCard(c, setname) end
+function Card.IsProcedureSummonable(c, cardtype, sumtype, must_use, mg, min, max) end
+function Card.IsPublic(c) end
+function Card.IsQuickPlaySpell(c) end
 
 ---Checks if the Monster Type of "c" is "race" (if it is to be used as material for "scard" with Summon type "sumtype" by player "playerid").
 ---@param c Card
@@ -531,6 +614,12 @@ function Card.IsLocation(c, location) end
 ---@param playerid Player?
 ---@return boolean
 function Card.IsRace(c, race, scard, sumtype, playerid) end
+
+function Card.IsRank(c, ...) end
+function Card.IsRankAbove(c, rank) end
+function Card.IsRankBelow(c, rank) end
+function Card.IsReason(c, reason) end
+function Card.IsReincarnationSummoned(c) end
 
 ---Checks whether a card (Card c) is related to battle (either as attacker or as an attack target)
 ---@param c Card
@@ -630,16 +719,82 @@ Duel = {}
 ---@param e Effect
 function Duel.Activate(e) end
 
+function Duel.ActivateFieldSpell(c, e, tp, eg, ep, ev, re, r, rp, target_p) end
+
 ---Registers an activity with type (int activity_type), with id (int counter_id), that matches (function f)
 ---@param counter_id integer
 ---@param activity_type integer
 ---@param f function
 function Duel.AddCustomActivityCounter(counter_id, activity_type, f) end
 
+function Duel.AddNoTributeCheck() end
+function Duel.AdjustInstantly(c) end
+function Duel.AnnounceAnotherAttribute(g, player) end
+function Duel.AnnounceAnotherRace(g, player) end
+function Duel.AnnounceAttribute(player, count, available) end
+function Duel.AnnounceCard(player, ...) end
+function Duel.AnnounceCoin(player, confirm_dialog) end
+function Duel.AnnounceLevel(player, min, max, exception, ...) end
+function Duel.AnnounceNumber(player, number, ...) end
+function Duel.AnnounceNumberRange(player, min, max, ...) end
+function Duel.AnnounceRace(player, count, available) end
+function Duel.AskAny(stringid) end
+function Duel.AsyEveryone(stringid) end
+function Duel.AssumeReset() end
+function Duel.AttackCostPaid(paid) end
+
 ---Separates an effect for the purposes of timing (Reflects the effects of the conjunctives "then" and "also after that")
 function Duel.BreakEffect() end
 
+function Duel.CalculateDamage(c1, c2) end
+function Duel.CallCoin(player) end
+function Duel.CanPlayerSetMonster(player, sumcard, sumtype) end
+function Duel.CanPlayerSetSpellTrap(player, setcard) end
+function Duel.ChainAttack(c) end
+function Duel.ChangeAttacker(c, ign) end
+function Duel.ChangeAttackTarget(c) end
+function Duel.ChangeBattleDamage(player, value, check) end
+function Duel.ChangeChainOperation(chainc, f) end
+function Duel.ChangePosition(targets, au, ad, du, dd, noflip) end
+function Duel.ChangeTargetCard(chainc, g) end
+function Duel.ChangeTargetParam(chainc, param) end
+function Duel.ChangeTargetPlayer(chainc, player) end
+function Duel.CheckChainTarget(chainc, c) end
+function Duel.CheckChainUniqueness() end
+function Duel.CheckEvent(event, get_info) end
+
+---Checks if there is an position (int seq) available for the player (int player) in the location (int location). (The sequence (int seq) is used to indicate the specific position of the location, for example in the location of monsters the sequence would go from 0 to 7., etc.)
+---@param player Player
+---@param location Location
+---@param seq integer
+---@return boolean
+function Duel.CheckLocation(player, location, seq) end
+
+---Checks if a player (int player) can pay an amount (int cost) of LP
+---@param player Player
+---@param cost integer
+---@return boolean
+function Duel.CheckLPCost(player, cost) end
+
+function Duel.CheckPendulumZones(player) end
+function Duel.CheckPhaseActivity() end
+
+---Check if there is a monster that can be used as tribute from the int player, that satisfies function, having a min and a max of the count specified with the exception of some card/group if specified, ... are extra arguments. If use_hand is true, then cards in the hand are considered for the tribute. If use_oppo is true, opponent's cards are also considered for the tribute. If check_field is true and card_to_check is passed, the function will also take in account to check if there are free zones (int zone) left on to_player's field to summon that card after tributing the cards. Also effects of cards like "Lair of Darkness" are taken into account when performing those checks.
+---@param player Player
+---@param f CardFilterFunction
+---@param count integer
+---@param use_hand boolean?
+---@param max integer?
+---@param check_field boolean?
+---@param card_to_check Card?
+---@param to_player Player?
+---@param zone integer?
+---@param use_oppo boolean?
+---@param ex CardFilterExclusion
+---@param ... unknown
+---@return boolean
 function Duel.CheckReleaseGroup(player, f, count, use_hand, max, check_field, card_to_check, to_player, zone, use_oppo, ex, ...) end
+
 function Duel.CheckReleaseGroupCost(player, f, minc, maxc, use_hand, spcheck, ex, ...) end
 function Duel.CheckReleaseGroupEx(player, f, count, use_hand, max, check_field, card_to_check, to_player, zone, use_oppo, ex, ...) end
 function Duel.CheckReleaseGroupSummon(c, player, e, fil, min, max, last, ...) end
@@ -677,6 +832,9 @@ function Duel.Damage(player, value, reason, is_step, rp) end
 ---@param rp Player? default to reason player
 function Duel.Destroy(targets, reason, dest, rp) end
 
+function Duel.DisableSelfDestroyCheck(disable) end
+function Duel.DisableShuffleCheck(disable) end
+
 ---A player (int player) sends the top n cards (int count) to the Graveyard (discard mechanic) with a reason (int reason)
 ---@param player Player
 ---@param count integer
@@ -702,7 +860,20 @@ function Duel.DiscardHand(player, f, min, max, reason, ex, ...) end
 ---@return integer
 function Duel.Draw(player, count, reason) end
 
+---Enables the specified global flags (int global_flag) for the rest of the Duel (GLOBALFLAG_x).
+---@param global_flag integer
+function Duel.EnableGlobalFlag(global_flag) end
+
 function Duel.Equip(player, c1, c2) end
+function Duel.EquipComplete() end
+function Duel.ForceAttack(c1, c2) end
+
+---Gets the number of times (int player) has performed activities of (int activity_type). (See ACTIVITY_XXX constants, )
+---@param player Player
+---@param activity_type integer
+---@param ... unknown
+---@return integer, ...
+function Duel.GetActivityCount(player, activity_type, ...) end
 
 ---Gets the attacking card (or nil if there is no attacker)
 ---@return Card?
@@ -717,10 +888,43 @@ function Duel.GetAttackTarget() end
 ---@return integer
 function Duel.GetBattleDamage(player) end
 
+---Gets the number of battles (int player) has been involved in this turn
+---@param player Player
+---@return integer
+function Duel.GetBattledCount(player) end
+
 ---Returns as first value the monster that is currently battling from the perspective of tp (nil if tp has no currently battling monsters), as second value returns the battling monster from the perspective of 1-tp.
 ---@param tp Player
 ---@return Card|nil, Card|nil
 function Duel.GetBattleMonster(tp) end
+
+function Duel.GetCardAliasFromCode(code) end
+function Duel.GetCardAttackFromCode(code) end
+function Duel.GetCardAttributeFromCode(code) end
+function Duel.GetCardDefenseFromCode(code) end
+function Duel.GetCardFromCardID(cardid) end
+function Duel.GetCardLevelFromCode(code) end
+function Duel.GetCardLinkMarkerFromCode(code) end
+function Duel.GetCardLscaleFromCode(code) end
+function Duel.GetCardRaceFromCode(code) end
+function Duel.GetCardRscaleFromCode(code) end
+function Duel.GetCardSetcodeFromCode(code) end
+function Duel.GetCardTypeFromCode(code) end
+
+---Returns the chain link properties (aka, chain Info, described by constant group CHAININFO_) of the passed chain link (int chainc), or current chain if it's 0.
+---@param chainc integer
+---@param ... unknown
+---@return ...
+function Duel.GetChainInfo(chainc, ...) end
+
+function Duel.GetChainMaterial(player) end
+
+---Returns the values corresponding to the results of the last coins tosses.
+---@return ...
+function Duel.GetCoinResult() end
+
+function Duel.GetControl(targets, player, reset_phase, reset_count, zone, chose_player) end
+function Duel.GetCounter(player, s, o, countertype) end
 
 ---Returns the number of the current chain link. If real chain is true, then it will return the number of ACTUAL chains that have already formed, so in a target or cost function, it will not include the current chain in this count, while with that parameter as false the current chain will be included as well. Set this when you need to check for the current chain in an effect condition.
 ---@param real_chain boolean? default to false
@@ -731,7 +935,27 @@ function Duel.GetCurrentChain(real_chain) end
 ---@return integer
 function Duel.GetCurrentPhase() end
 
+---Returns a group with the (int count) cards on the bottom of (int player)'s Deck
+---@param player Player
+---@param count integer
+---@return Group
+function Duel.GetDeckbottomGroup(player, count) end
+
+---Gets a group of a player's (int player) top n (int count) cards of their Deck
+---@param player Player
+---@param count integer
+---@return Group
 function Duel.GetDecktopGroup(player, count) end
+
+---Returns the values corresponding to the results of the last dice rolls.
+---@return ...
+function Duel.GetDiceResult() end
+
+function Duel.GetDrawCount(player) end
+function Duel.GetDuelType() end
+function Duel.GetEnvironment() end
+function Duel.GetExtraTopGroup(player, count) end
+function Duel.GetFieldCard(player, location, seq) end
 
 ---Gets a group containing cards from a specified location of a player (int player), s denotes the player's side of the field, o denotes opposing player's side of the field
 ---@param player Player
@@ -775,6 +999,11 @@ function Duel.GetFlagEffect(player, code) end
 ---@return integer
 function Duel.GetFlagEffectLabel(player, code) end
 
+function Duel.GetFreeLinkedZone(player) end
+function Duel.GetFusionMaterial(player) end
+function Duel.GetLinkedGroup(player, location1, location2) end
+function Duel.GetLinkedGroupCount(player, location1, location2) end
+function Duel.GetLinkedZone(player) end
 
 ---Returns 2 values. First the number of zones that a player (target_player) has available in a location of the field (int location)[, that can be used by the player (use_player), with intention of (reason), among certain zones (zone)]. Second return is a flag with the available zones.
 ---@param player Player
@@ -829,9 +1058,29 @@ function Duel.GetMatchingGroupCount(f, player, s, o, ex, ...) end
 ---@return integer
 function Duel.GetMatchingGroupCountRush(f, player, s, o, ex, ...) end
 
+---Equivalent to Duel.GetMatchingGroup, but the cards are also filtered to match Auxiliary.FilterMaximumSideFunctionEx
+---@param f CardFilterFunction
+---@param player Player
+---@param s Location
+---@param o Location
+---@param ex CardFilterExclusion
+---@param ... unknown
+---@return Group
+function Duel.GetMatchingGroupRush(f, player, s, o, ex, ...) end
+
 function Duel.GetMetatable(code) end
 function Duel.GetMZoneCount(target_player, ex, use_player, reason, zone) end
+function Duel.GetOperatedGroup() end
+function Duel.GetOperationCount(chainc) end
 
+---Returns the corresponding values that were set by a previous call to Duel.SetOperationInfo for the corresponding category. If the first return value is true that means that operation info was set and then there will be 4 extra return values corresponding to the parameters of SetOperationInfo, otherwise only a single false value is returned.
+---@param chainc integer
+---@param category EffectCategory
+---@return boolean, Card|Group, integer, integer, integer
+function Duel.GetOperationInfo(chainc, category) end
+
+function Duel.GetOverlayCount(player, s, o) end
+function Duel.GetOverlayGroup(player, s, o) end
 function Duel.GetPlayerEffect(player, effect_type) end
 function Duel.GetPlayersCount(team) end
 function Duel.GetPossibleOperationInfo(chainc, category) end
@@ -842,11 +1091,25 @@ function Duel.GetPossibleOperationInfo(chainc, category) end
 ---@return integer
 function Duel.GetRandomNumber(min, max) end
 
+function Duel.GetReleaseGroup(player, use_hand, use_oppo) end
+function Duel.GetReleaseGroupCount(player, use_hand, use_oppo) end
+function Duel.GetRitualMaterial(player, checklevel) end
+function Duel.GetStartingHand(player) end
+function Duel.GetTargetCards(e) end
+function Duel.GetTargetCount(f, player, s, o, ex, ...) end
+function Duel.GetTributeCount(c, mg, ex) end
+function Duel.GetTributeGroup(c) end
+function Duel.GetTurnCount() end
+
 ---Returns the turn player (0 for the player who went first, 1 for the other)
 ---@return Player
 function Duel.GetTurnPlayer() end
 
-function Duel.GetTurnCount() end
+function Duel.GetUsableMZoneCount(target_player, using_player) end
+function Duel.GetZoneWithLinkedCount(count, tp) end
+function Duel.GoatConfirm(tp, loc) end
+function Duel.GrabSelectedCard() end
+function Duel.HasFlagEffect(tp, id, ct) end
 
 ---Creates a message for the "player" which has "type" as key and "desc" as value. It is entirely up to the client to interpret say data, the most common case is setting the selection message with, "type" being "HINT_SELECTMSG" and "desc" being a stringId. It is also used to implement Skill Cards visually. Check the "HINT_XXX" constants for their behaviour.
 ---@param hint_type integer
@@ -859,6 +1122,7 @@ function Duel.Hint(hint_type, player, desc) end
 ---@param log_as_selection boolean?
 function Duel.HintSelection(selection, log_as_selection) end
 
+function Duel.IncreaseSummonedCount(c) end
 function Duel.IsAbleToEnterBP() end
 function Duel.IsAttackCostPaid() end
 function Duel.IsBattlePhase() end
@@ -975,6 +1239,12 @@ function Duel.Overlay(c, of_card, send_to_grave) end
 ---@param player Player
 ---@param cost integer
 function Duel.PayLPCost(player, cost) end
+
+function Duel.PendulumSummon(player) end
+function Duel.PlayFieldSpell(c, e, tp, eg, ep, ev, re, r, rp, target_p) end
+function Duel.ProcedureSummon(player, sumtype, c, must_use, mg, minc, maxc) end
+function Duel.ProcedureSummonGroup(player, sumtype) end
+
 ---Raises a specific event that will raise effects of type EFFECT_TYPE_FIELD, by relying re,r,rp,ep,ev as the arguments of that event with eg being the cards that were the reason of that event.
 ---@param eg Card|Group
 ---@param code EffectCode
@@ -996,6 +1266,8 @@ function Duel.RaiseEvent(eg, code, re, r, rp, ep, ev) end
 function Duel.RaiseSingleEvent(ec, code, re, r, rp, ep, ev) end
 
 function Duel.RDComplete() end
+
+---Makes the game do the adjustments ( win, disable, control, self destroy, equip, position, trap monster). Calling this while adjusting (most likely, in EVENT_ADJUST) four times with the same card (calling this will raise EVENT_ADJUST at the end, so it is possible to loop) will make the card instantly destroyed.
 function Duel.Readjust() end
 
 ---Increases player's (int player) Life Points by an amount (int value) for a reason (REASON_x). Setting is_step to true made the recovery considered being done at the call of Duel.RDComplete()
@@ -1021,6 +1293,9 @@ function Duel.RemoveOverlayCard(player, s, o, min, max, reason, rg) end
 function Duel.ResetFlagEffect(player, code) end
 function Duel.ReturnToField(c, pos, zone) end
 function Duel.RockPaperScissors(repeated) end
+function Duel.SelectCardsFromCodes(sel_player, min, max, cancelable, return_index, code1, ...) end
+function Duel.SelectDisableField(player, count, s, o, filter, all_field) end
+function Duel.SelectEffect(player, ...) end
 
 ---Asks (int player) Yes or No, with the question being specified by (int desc) highlighting the passed card (Card c). The default string ask the player if they want to use the effect of "card x"
 ---@param player Player
@@ -1068,7 +1343,20 @@ function Duel.SelectMatchingCard(sel_player, f, player, s, o, min, max, cancelab
 ---@param desc1 integer
 ---@param ... integer
 ---@return integer
+---@overload fun(player: Player, desc1: integer, ...: integer)
 function Duel.SelectOption(player, confirm_dialog, desc1, ...) end
+
+---Makes int player select a position int pos for card c
+---@param player Player
+---@param c Card
+---@param pos BattlePosition
+---@return integer
+function Duel.SelectPosition(player, c, pos) end
+
+function Duel.SelectReleaseGroup(sel_player, f, min, max, use_hand, cancelable, check_field, card_to_check, to_player, zone, use_oppo, ex, ...) end
+function Duel.SelectReleaseGroupCost(player, f, min, max, use_hand, specialchk, ex, ...) end
+function Duel.SelectReleaseGroupEx(player, f, min, max, use_hand, cancelable, check_field, card_to_check, to_player, zone, use_oppo, ex, ...) end
+function Duel.SelectReleaseGroupSummon(c, player, e, fil, min, max, last, ...) end
 
 ---This function's behaviour is equivalent of calling Duel.SelectMatchingCard with the same arguments and filtering cards with Card.IsCanBeEffectTarget with the current reason effect as parameter (internal to the core, but most of the time corresponds to the effect itself)
 ---@param sel_player Player
@@ -1109,6 +1397,8 @@ function Duel.Sendto(targets, location, reason, pos, player, sequence, rp) end
 ---@return integer
 function Duel.SendtoDeck(targets, player, seq, reason, rp) end
 
+function Duel.SendtoExtraP(targets, player, reason) end
+
 ---Sends a card or group (Card|Group targets) to the Graveyard with (int reason) as reason, if (int player) is supplied, the destination would be that player's Graveyard. If (int rp) is provided, sets the reason player to be that player. Returns the number of cards successfully sent.
 ---@param targets Card|Group
 ---@param reason Reason
@@ -1123,12 +1413,23 @@ function Duel.SendtoGrave(targets, reason, player, rp) end
 ---@param reason Reason
 function Duel.SendtoHand(targets, player, reason) end
 
+function Duel.SetChainLimit(f) end
+function Duel.SetChainLimitTillChainEnd(f) end
+function Duel.SetCoinResult(res, ...) end
+function Duel.SetDiceResult(res, ...) end
+
+---Assigns an integer (int label) number to the flag effect registered to the player (int player) with (int code) as the effect code. Returns true if a flag effect with such code existed and the label was set.
+---@param player any
+---@param code any
+---@param label any
+function Duel.SetFlagEffectLabel(player, code, label) end
+
+function Duel.SetFusionMaterial(g) end
+
 ---	Sets a specified player's (int player) current Life Point to (int lp). (Used by effects that "make the LP become X")
 ---@param player Player
 ---@param lp integer
 function Duel.SetLP(player, lp) end
-
-function Duel.SetPossibleOperationInfo(chainc, category, targets, count, target_player, target_param) end
 
 ---Sets informations about the operation being performed in the current (int chainc = 0) chain, belonging to (int category), with a total of (int count) of card(s) from (Card|Group targets) being affected. These are used with GetOperationInfo. Also, the parameter passed here are checked if any of the summon related activities are checked like ACTIVITY_SUMMON, ACTIVITY_NORMALSUMMON, ACTIVITY_SPSUMMON and ACTIVITY_FLIPSUMMON.
 ---@param chainc integer
@@ -1139,9 +1440,27 @@ function Duel.SetPossibleOperationInfo(chainc, category, targets, count, target_
 ---@param target_param integer
 function Duel.SetOperationInfo(chainc, category, targets, count, target_player, target_param) end
 
+function Duel.SetPossibleOperationInfo(chainc, category, targets, count, target_player, target_param) end
+function Duel.SetSelectedCard(cards) end
+function Duel.SetTargetCard(targets) end
+function Duel.SetTargetParam(r) end
+
 ---Shuffles the deck of (int player). Handled automatically if a card is sent to deck sequence -2.
 ---@param player Player
 function Duel.ShuffleDeck(player) end
+
+---Shuffles the Extra Deck of (int player). Must be used after confirming cards in the Extra Deck.
+---@param player Player
+function Duel.ShuffleExtra(player) end
+
+---Shuffles the hand of (int player). Handled automatically after Duel.ConfirmCards().
+---@param player Player
+function Duel.ShuffleHand(player) end
+
+function Duel.ShuffleSetCard(g) end
+function Duel.SkipPhase(player, phase, reset_flag, reset_count, value) end
+function Duel.SortDeckbottom(sort_player, target_player, count) end
+function Duel.SortDecktop(sort_player, target_player, count) end
 
 ---A player (int sumplayer) Special Summons a card/group of cards (Card|Group targets) with summon type described with SUMMON_TYPE_x (int sumtype) to a player's (int target_player) field in the specific zone (here zone 0xff, means the default zones). If (bool nocheck) is true, it will summon ignoring conditions. If (bool nolimit) is true, it will summon ignoring the revive limit. Returns the number of cards successfully summoned.
 ---@param targets Card|Group
@@ -1155,14 +1474,47 @@ function Duel.ShuffleDeck(player) end
 ---@return integer
 function Duel.SpecialSummon(targets, sumtype, sumplayer, target_player, nocheck, nolimit, pos, zone) end
 
+---Completes Special Summons conducted with Duel.SpecialSummonStep. This has to be called even if all the Duel.SpecialSummonStep fails.
+---@return integer?
+function Duel.SpecialSummonComplete() end
+
+function Duel.SpecialSummonRule(player, c, sumtype) end
+function Duel.SpecialSummonStep(c, sumtype, sumplayer, target_player, nocheck, nolimit, pos) end
+function Duel.SSet(player, targets, target_player, confirm) end
+function Duel.Summon(player, c, ignore_count, e, min, zone) end
+function Duel.SwapControl(c1, c2, reset_phase, reset_count) end
+function Duel.SwapDeckAndGrave(player) end
+function Duel.SwapSequence(c1, c2) end
+function Duel.SynchroSummon(player, c, must_use, mg, minc, maxc) end
+function Duel.TagSwap(team) end
+
+---Tosses (int count) coins on behalf of (int player). Returns all the results of the tosses.
+---@param player Player
+---@param count integer
+---@return ...
 function Duel.TossCoin(player, count) end
-function Duel.TossDice(player, count1) end
+
+---Rolls (int count1) dice on behalf of (int player) and (int count1) dice on behalf of the opponent of (int player). Returns all the results of the rolls.
+---@param player Player
+---@param count1 integer
+---@param count2 integer?
+---@return ...
+function Duel.TossDice(player, count1, count2) end
+
+---Player (int player) wins the Duel for a reason (REASON_x). If the player is affected by EFFECT_CANNOT_LOSE_EFFECT the duel keeps going on.
+---@param player Player
+---@param win_reason integer
+function Duel.Win(player, win_reason) end
+
+function Duel.XyzSummon(player, c, must_use, mg, minc, maxc) end
 
 --#endregion
 
 --#region Effect
 ---@class Effect
 Effect = {}
+
+function Effect.CheckCountLimit(tp) end
 
 ---Clone an effect object (Effect e), duplicating all except register status and assigned labels.
 ---@param e Effect
@@ -1174,12 +1526,46 @@ function Effect.Clone(e) end
 ---@return Effect
 function Effect.CreateEffect(c) end
 
+function Effect.CreateMysteruneQPEffect(c, id, uniquecat, uniquetg, uniqueop, rmcount, uniqueprop, uniquecode) end
+function Effect.CreateVernalizerSPEffect(c, id, desc, uniquecat, uniquetg, uniqueop) end
+
+---Returns a Effect object from a given lua reference. The function errors out if the reference is invalid or does not refer to a Effect object.
+---@param ref integer
+---@return Effect
+function Effect.FromLuaRef(ref) end
+
+function Effect.GetActivateLocation(e) end
+function Effect.GetActivateSequence(e) end
+function Effect.GetActiveType(e) end
+
+---Gets an effect's (Effect e) category
+---@param e Effect
+---@return integer
+function Effect.GetCategory(e) end
+
+---Gets (Effect e)'s code
+---@param e Effect
+---@return integer
+function Effect.GetCode(e) end
+
 ---Gets an effect's (Effect e) condition function, returns nil if no function was set
 ---@param e Effect
 ---@return function
 function Effect.GetCondition(e) end
 
+---Gets an effect's (Effect e) cost function, returns nil if no function was set
+---@param e Effect
+---@return function
+function Effect.GetCost(e) end
+
+function Effect.GetCountLimit(e) end
+
+---Gets an effect's (Effect e) category
+---@param e Effect
+---@return integer
 function Effect.GetDescription(e) end
+
+function Effect.GetFieldID(e) end
 
 ---Gets an effect's (Effect e) card handler, if the effect is not attached to a card (i.e. registered to player) it returns nil
 ---@param e Effect
@@ -1191,6 +1577,8 @@ function Effect.GetHandler(e) end
 ---@return Player
 function Effect.GetHandlerPlayer(e) end
 
+function Effect.GetHintTiming(e) end
+
 ---Gets an effect's (Effect e) internal labels. If no labels are present, it will return 0.
 ---@param e Effect
 ---@return integer
@@ -1201,12 +1589,47 @@ function Effect.GetLabel(e) end
 ---@return Card|Group|Effect|table
 function Effect.GetLabelObject(e) end
 
+function Effect.GetLuaRef(e) end
+
 ---Gets an effect's (Effect e) operation function, returns nil if no function was set
 ---@param e Effect
 ---@return function
 function Effect.GetOperation(e) end
 
----comment
+function Effect.GetOwner(e) end
+function Effect.GetOwnerPlayer(e) end
+
+---Gets an effect's (Effect e) property
+---@param e Effect
+---@return integer
+function Effect.GetProperty(e) end
+
+---Gets an effect's range (the value defined in SetRange)
+---@param e Effect
+---@return integer
+function Effect.GetRange(e) end
+
+---Gets (Effect e)'s reset flags and reset count.
+---@param e Effect
+---@return integer, integer
+function Effect.GetReset(e) end
+
+---Gets an effect's (Effect e) target function, returns nil if no function was set
+---@param e Effect
+---@return function
+function Effect.GetTarget(e) end
+
+---Returns the pair of values set in (Effect e)'s SetTargetRange.
+---@param e Effect
+---@return integer, integer
+function Effect.GetTargetRange(e) end
+
+---Gets an effect's (Effect e) type
+---@param e Effect
+---@return integer
+function Effect.GetType(e) end
+
+---Gets an effect's (Effect e) value or value function, returns nil if no function was set
 ---@param e Effect
 ---@return integer
 function Effect.GetValue(e) end
@@ -1215,11 +1638,57 @@ function Effect.GetValue(e) end
 ---@return Effect
 function Effect.GlobalEffect() end
 
+---Checks if an effect (Effect e) can be activated by a player (int player). If ignore location is true, the handler of the effect is not checked to be in a valid location for that effect to be activated. If ignore target is true, then the target function is not executed to check if the effect can be activated.
+---@param e Effect
+---@param player Player
+---@param ignore_location boolean?
+---@param ignore_target boolean?
+---@return boolean
+function Effect.IsActivatable(e, player, ignore_location, ignore_target) end
+
+---	Returns if an effect (Effect e) is an activated effect. Effectively, this checks if the effect has any of the following types: EFFECT_TYPE_ACTIVATE, EFFECT_TYPE_FLIP, EFFECT_TYPE_IGNITION, EFFECT_TYPE_TRIGGER_O, EFFECT_TYPE_QUICK_O, EFFECT_TYPE_TRIGGER_F or EFFECT_TYPE_QUICK_F
+---@param e Effect
+---@return boolean
+function Effect.IsActivated(e) end
+
+---Compares (with OR) an effect's (Effect e) card type of activation effect with supplied type (int type). Activation type is often the handler's card type, or the owner's if not attached to a card. Exception for Pendulum scale activation (would return TYPE_SPELL+TYPE_PENDULUM).
+---@param e Effect
+---@param type integer
+---@return boolean
+function Effect.IsActiveType(e, type) end
+
+---Returns if the Effect object got internally deleted and remained as dangling reference inside the lua state.
+---@param e Effect
+function Effect.IsDeleted(e) end
+
 ---Returns true if the effect (Effect e) has any category listed in (int cate), otherwise returns false
 ---@param e Effect
 ---@param cate EffectCategory
 ---@return boolean
 function Effect.IsHasCategory(e, cate) end
+
+---Returns true if the effect (Effect e) has any property listed in (int prop1) or (int prop2), otherwise returns false
+---@param e Effect
+---@param prop1 integer
+---@return boolean
+function Effect.IsHasProperty(e, prop1) end
+
+---Returns true if the effect (Effect e) has any type listed in (int type), otherwise returns false
+---@param e Effect
+---@param type integer
+---@return boolean
+function Effect.IsHasType(e, type) end
+
+function Effect.IsMonsterEffect(e) end
+function Effect.IsSpellEffect(e) end
+function Effect.IsSpellTrapEffect(e) end
+function Effect.IsTrapEffect(e) end
+
+---Reset an effect (Effect e) and makes it collectible by the garbage collector. Even if the effect seems to be usable it SHOULD NOT be used in other places after calling this function.
+---@param e Effect
+function Effect.Reset(e) end
+
+function Effect.SetAbsoluteRange(e, playerid, s_range, o_range) end
 
 ---Sets an effect's (Effect e) category. Refer to constant.lua for valid categories.
 ---@param e Effect
@@ -1285,7 +1754,6 @@ function Effect.SetOwnerPlayer(e, player) end
 ---@param prop2 integer?
 function Effect.SetProperty(e, prop1, prop2) end
 
-
 ---Sets an effect's (Effect e) effective range (int range) i.e. LOCATION_MZONE. The location is the effect handler's location.
 ---@param e Effect
 ---@param range Location
@@ -1339,6 +1807,33 @@ Group = {}
 ---@return Group
 function Group.AddCard(g, c) end
 
+---Returns a group containing all the maximum parts of cards that are in maximum mode in the group g,
+---@param g Group
+---@return Group
+function Group.AddMaximumCheck(g) end
+
+function Group.CheckDifferentProperty(g, f, ...) end
+function Group.CheckDifferentPropertyBinary(g, f, ...) end
+function Group.CheckSameProperty(g, f, ...) end
+
+---Checks if there is a combination of cards, with a minimum and maximum, that has the sum of f(c, ...) result equal to (int sum) in a group (Group g). Function f accepts at least one parameter (f(c, ...). with c as each member of the group), and the return value should be integer. The second returned value indicates whether the check failed because of overtributing (in which case it will be true), or because of undertributing.
+---@param g Group
+---@param f CardFilterFunction
+---@param sum integer
+---@param min integer
+---@param max integer
+---@param ... unknown
+---@return boolean, boolean
+function Group.CheckWithSumEqual(g, f, sum, min, max, ...) end
+
+---Checks if there is a combination of cards, with a minimum and maximum, that has the sum of f(c, ...) result greater than or equal to (int sum) in a group (Group g). Function f accepts at least one parameter (f(c, ...), with c as each member of the group), and the return value should be integer. The second returned value indicates whether the check failed because of overtributing (in which case it will be true), or because of undertributing.
+---@param g Group
+---@param f CardFilterFunction
+---@param sum integer
+---@param ... unknown
+---@return boolean, boolean
+function Group.CheckWithSumGreater(g, f, sum, ...) end
+
 ---Removes all the elements from a group (Group g). Returns the group itself.
 ---@param g Group
 ---@return Group
@@ -1352,6 +1847,16 @@ function Group.Clone(g) end
 ---Create a new Group object
 ---@return Group
 function Group.CreateGroup() end
+
+---	Makes a group that was kept alive be collectable (Group g)
+---@param g Group
+function Group.DeleteGroup(g) end
+
+---Checks if the first group (Group g1) has the same members with the second group (Group g2)
+---@param g1 Group
+---@param g2 Group
+---@return boolean
+function Group.Equal(g1, g2) end
 
 ---Create a new group with members from another group (Group g) filtered according to a function (function f). Excludes a card/group (Group/Card ex) if not nil. Function f accepts at least one parameter (f(c, ...), with c as each member of the group), and the card will be included if f(c, ...) returns true.
 ---@param g Group
@@ -1393,6 +1898,14 @@ function Group.ForEach(g, f, ...) end
 ---@return Group
 function Group.FromCards(c, ...) end
 
+---Returns a Group object from a given lua reference. The function errors out if the reference is invalid or does not refer to a Group object.
+---@param ref integer
+---@return Group
+function Group.FromLuaRef(ref) end
+
+function Group.GetBinClassCount(g, f) end
+function Group.GetBitwiseOr(g, f, ...) end
+
 ---Returns a table containing all the different values returned by applying the function f to all the members of the Group g,
 ---@param g Group
 ---@param f CardToIntFunction
@@ -1416,6 +1929,9 @@ function Group.GetCount(g) end
 ---@param g Group
 ---@return Card
 function Group.GetFirst(g) end
+
+function Group.GetLinkedZone(g, cp) end
+function Group.GetLuaRef(g) end
 
 ---Create a new group with members from another group (Group g) which has the maximum result from f(c, ...). Function f accepts at least one parameter (f(c, ...), with c as each member of the group), and the return value should be integer, if the group g have no element, that function will return nil.
 ---@param g Group
@@ -1443,6 +1959,8 @@ function Group.GetNext(g) end
 ---@return integer
 function Group.GetSum(g, f, ...) end
 
+function Group.GetToBeLinkedZone(tc, c, tp, clink, emz) end
+
 ---Checks if (Group g1) contains all cards in (Group g2)
 ---@param g1 Group
 ---@param g2 Group
@@ -1455,6 +1973,11 @@ function Group.Includes(g1, g2) end
 ---@return boolean
 function Group.IsContains(g, c) end
 
+---Returns if the Group object got internally deleted and remained as dangling reference inside the lua state.
+---@param g Group
+---@return boolean
+function Group.IsDeleted(g) end
+
 ---Checks if at least a number (int count) of members of a group (Group g) meet the function (function f). Excludes a card (Card ex) if not nil. Function f accepts at least one parameter (f(c, ...), with c as each member of the group), and the card will be included if f(c, ...) returns true.
 ---@param g Group
 ---@param f CardFilterFunction
@@ -1464,8 +1987,14 @@ function Group.IsContains(g, c) end
 ---@return boolean
 function Group.IsExists(g, f, count, ex, ...) end
 
+---Iterates over the cards in (Group g) for use with for loops
+---@param g Group
+---@return unknown
+function Group.Iter(g) end
+
 ---Make a group (Group g) not be destroyed upon exiting the function
 ---@param g Group
+---@return Group
 function Group.KeepAlive(g) end
 
 ---It has the same behaviour as Group.Filter but the changes are done to the Group g and no new group is created.\
@@ -1534,6 +2063,22 @@ function Group.Select(g, player, min, max, cancelable, ex) end
 ---@param max integer?
 ---@return Card
 function Group.SelectUnselect(g1, g2, player, finishable, cancelable, min, max) end
+
+---Makes a player (int player) select members of a group (Group g) which results in a combination of cards, with a minimum and maximum, that has the sum of f(c, ...) result equal to (int sum). Function f accepts at least one parameter (f(c, ...), with c as each member of the group), and the return value should be integer.
+---@param g Group
+---@param player Player
+---@param f CardFilterFunction
+---@param sum integer
+---@param ... unknown
+function Group.SelectWithSumEqual(g, player, f, sum, ...) end
+
+---Makes a player (int player) select members of a group (Group g) which results in a combination of cards, with a minimum and maximum, that has the sum of f(c, ...) result greater than or equal to (int sum). Function f accepts at least one parameter (f(c, ...), with c as each member of the group), and the return value should be integer.
+---@param g Group
+---@param player Player
+---@param f CardFilterFunction
+---@param sum integer
+---@param ... unknown
+function Group.SelectWithSumGreater(g, player, f, sum, ...) end
 
 ---Returns 2 groups, the first group will contain cards matched with the same behaviour as Group.Filter, the second group will contain the remaining cards from the Group g.
 ---@param g Group
