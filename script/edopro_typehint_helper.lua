@@ -24,8 +24,6 @@ CardPrototype = {}
 ---@return CardPrototype, integer
 function GetID() end
 
-
-
 --#region Debug
 
 ---@class Debug
@@ -42,11 +40,19 @@ Debug = {}
 ---@return Card
 function Debug.AddCard(code, owner, player, location, seq, pos, proc) end
 
-
-
 ---Sends (any msg) as a script error to the logs
 ---@param msg any
 function Debug.Message(msg) end
+
+function Debug.PreAddCounter(c, counter_type, count) end
+function Debug.PreEquip(equip_card, target) end
+function Debug.PreSetTarget(c, target) end
+function Debug.PreSummon(c, sum_type, sum_location, summon_sequence, summon_pzone) end
+function Debug.ReloadFieldBegin(flag, rule, ignore_rule) end
+function Debug.ReloadFieldEnd() end
+function Debug.SetAIName(name) end
+function Debug.SetPlayerInfo(playerid, lp, startcount, drawcount) end
+function Debug.ShowHint(msg) end
 
 --#endregion
 
@@ -308,19 +314,105 @@ function Card.GetDefense(c) end
 ---@return integer
 function Card.GetLevel(c) end
 
+function Card.GetLink(c) end
+function Card.GetLinkMarker(c) end
+function Card.GetLinkedGroup(c) end
+function Card.GetLinkedGroupCount(c) end
+function Card.GetLinkedZone(c, cp) end
+
+---Returns the location of "c".
+---@param c Card
+---@return Location
+function Card.GetLocation(c) end
+
+function Card.GetLuaRef(c) end
+function Card.GetMaterial(c) end
+function Card.GetMaterialCount(c) end
+function Card.GetMaterialCountRush(c) end
+function Card.GetMaximumAttack(c) end
+function Card.GetMetatable(c, current_code) end
+function Card.GetMutualLinkedGroup(c) end
+function Card.GetMutualLinkedGroupCount(c) end
+function Card.GetMutualLinkedZone(c, cp) end
+
+function Card.GetOriginalAttribute(c) end
+function Card.GetOriginalCode(c) end
+function Card.GetOriginalCodeRule(c) end
+function Card.GetOriginalLeftScale(c) end
+
+
 ---Returns the original Level of "c". (Returns 0 if it has no Level, e.g. Xyz/Link.)
 ---@param c Card
 ---@return integer
 function Card.GetOriginalLevel(c) end
 
+function Card.GetOriginalRace(c) end
 function Card.GetOriginalRank(c) end
+function Card.GetOriginalRightScale(c) end
+function Card.GetOriginalSetCard(c) end
+function Card.GetOriginalType(c) end
 
 ---Returns the owner of "c".
 ---@param c Card
 ---@return Player
 function Card.GetOwner(c) end
 
+function Card.GetOwnerTarget(c) end
+function Card.GetOwnerTargetCount(c) end
+function Card.GetPosition(c) end
+function Card.GetPreviousAttackOnField(c) end
+function Card.GetPreviousAttributeOnField(c) end
+function Card.GetPreviousCodeOnField(c) end
+function Card.GetPreviousControler(c) end
+function Card.GetPreviousDefenseOnField(c) end
+function Card.GetPreviousEquipTarget(c) end
+function Card.GetPreviousLevelOnField(c) end
+function Card.GetPreviousLocation(c) end
+function Card.GetPreviousPosition(c) end
+function Card.GetPreviousRaceOnField(c) end
+function Card.GetPreviousRankOnField(c) end
+function Card.GetPreviousSequence(c) end
+function Card.GetPreviousSetCard(c) end
+function Card.GetPreviousTypeOnField(c) end
+
+---Returns the current Monster Type of "c" (if it is to be used as material for "scard" with Summon type "sumtype" by player "playerid").
+---@param c Card
+---@param scard Card?
+---@param sumtype SummonType?
+---@param playerid Player?
+---@return Race
+function Card.GetRace(c, scard, sumtype, playerid) end
+
 function Card.GetRank(c) end
+function Card.GetRealFieldID(c) end
+function Card.GetReason(c) end
+function Card.GetReasonCard(c) end
+function Card.GetReasonEffect(c) end
+function Card.GetReasonPlayer(c) end
+function Card.GetRightScale(c) end
+function Card.GetRitualLevel(c, rc) end
+function Card.GetScale(c) end
+function Card.GetSequence(c) end
+
+---Returns the archetype(s) that "c" has (if it is to be used as material for "scard" with Summon type "sumtype" by player "playerid").
+---@param c Card
+---@param scard Card?
+---@param sumtype SummonType?
+---@param playerid Player?
+---@return integer
+function Card.GetSetCard(c, scard, sumtype, playerid) end
+
+function Card.GetSummonLocation(c) end
+function Card.GetSummonPlayer(c) end
+function Card.GetSummonType(c) end
+function Card.GetSynchroLevel(c, sc) end
+function Card.GetTextAttack(c) end
+function Card.GetTextDefense(c) end
+
+function Card.GetToBeLinkedZone(g, c, tp, clink, emz) end
+function Card.GetTributeRequirement(c) end
+function Card.GetTurnCounter(c) end
+function Card.GetTurnID(c) end
 
 ---Gets the current type of a Card (Card c) where (Card scard) if provided checks the monster that (Card c) would be used as material, (int sumtype) is for checking the summon type and (int playerid) is the player checking the type.
 ---@param c Card
@@ -329,6 +421,12 @@ function Card.GetRank(c) end
 ---@param playerid Player?
 ---@return CardType
 function Card.GetType(c, scard, sumtype, playerid) end
+
+function Card.IsAbleToChangeControler(c) end
+function Card.IsAbleToDeck(c) end
+function Card.IsAbleToDeckAsCost(c) end
+function Card.IsAbleToExtra(c) end
+function Card.IsAbleToExtraAsCost(c) end
 
 ---Checks if a card (Card c) is able to go to the Graveyard
 ---@param c Card
@@ -340,11 +438,50 @@ function Card.IsAbleToGrave(c) end
 ---@return boolean
 function Card.IsAbleToGraveAsCost(c) end
 
+function Card.IsAbleToHand(c) end
+function Card.IsAbleToHandAsCost(c) end
+function Card.IsAbleToRemove(c, player, pos, reason) end
+function Card.IsAbleToRemoveAsCost(c, pos) end
+function Card.IsAllColumn(c) end
+function Card.IsAttack(c, ...) end
+function Card.IsAttackAbove(c, atk) end
+function Card.IsAttackBelow(c, atk) end
+function Card.IsAttackPos(c) end
+function Card.IsAttribute(c, attribute, scard, sumtype, playerid) end
+function Card.IsAttributeExcept(c, att, card, scard, sumtype, playerid) end
+function Card.IsBattleDestroyed(c) end
+function Card.IsCanAddCounter(c, countertype, count, least_one, loc) end
+function Card.IsCanBeBattleTarget(c1, c2) end
+function Card.IsCanBeDisabledByEffect(e, is_monster_effect) end
+function Card.IsCanBeEffectTarget(c, e) end
+
+---Checks if a card (Card c) can be a Fusion material. If (Card fc) is provided, checks if it can be a Fusion Material for that card. If ignore_mon is true, it does not check whether the card is a monster.
+---@param c Card
+---@param fc Card?
+---@param ignore_mon boolean?
+---@return boolean
+function Card.IsCanBeFusionMaterial(c, fc, ignore_mon) end
+
+function Card.IsCanBeLinkMaterial(c, linkc) end
+function Card.IsCanBeMaterial(c, summontype) end
+function Card.IsCanBeRitualMaterial(c, sc, player) end
+function Card.IsCanBeSpecialSummoned(c, e, sumtype, sumplayer, nocheck, nolimit, sumpos, target_player, zone) end
+function Card.IsCanBeSynchroMaterial(c, sc, tuner, player) end
+function Card.IsCanBeXyzMaterial(c, sc, tp, reason) end
+function Card.IsCanChangePosition (c) end
+function Card.IsCanChangePositionRush(c) end
+function Card.IsCanRemoveCounter(c, player, countertype, count, reason) end
+function Card.IsCanTurnSet(c) end
+
 ---Checks if "c" has at least 1 code/ID among the "..." list.
 ---@param c Card
 ---@param ... integer
 ---@return boolean
 function Card.IsCode(c, ...) end
+
+function Card.IsCode(c, ...) end
+function Card.IsContinuousSpell(c) end
+function Card.IsContinuousTrap(c) end
 
 ---Checks if a card (Card c) has player (int p) as it's controller
 ---@param c Card
@@ -352,12 +489,29 @@ function Card.IsCode(c, ...) end
 ---@return boolean
 function Card.IsControler(c, controler) end
 
+function Card.IsControlerCanBeChanged(c, ign, zone) end
+function Card.IsCounterTrap(c) end
+function Card.IsDefense(c, ...) end
+function Card.IsDefenseAbove(c, def) end
+function Card.IsDefenseBelow(c, def) end
+function Card.IsDefensePos(c) end
+
+---	Returns if the Card object got internally deleted and remained as dangling reference inside the lua state.
+---@param c Card
+---@return true
+function Card.IsDeleted(c) end
+
 ---Checks if a card (Card c) can be discarded for (int reason).
 ---@param c Card
 ---@param reason Reason? = REASON_COST
 ---@return boolean
 function Card.IsDiscardable(c, reason) end
 
+function Card.IsDoubleTribute(c, ...) end
+function Card.IsEquipSpell(c) end
+function Card.IsEvenScale(c) end
+function Card.IsExactType(c, typ, sumc, sumtype, player) end
+function Card.IsExtraLinked(c) end
 function Card.IsFacedown(c) end
 function Card.IsFaceup(c) end
 
@@ -402,6 +556,11 @@ function Card.IsRelateToChain(c, chainc) end
 function Card.IsRelateToEffect(c, e) end
 
 function Card.IsReleasable(c) end
+function Card.IsReleasableByEffect(c) end
+function Card.IsRikkaReleasable(c) end
+function Card.IsRitualMonster(c) end
+function Card.IsRitualSpell(c) end
+function Card.IsSequence(c, ...) end
 
 ---Checks if "c" is part of the archetype "setname" (if it is to be used as material for "scard" with Summon type "sumtype" by player "playerid").
 ---@param c Card
@@ -412,6 +571,12 @@ function Card.IsReleasable(c) end
 ---@return boolean
 function Card.IsSetCard(c, setname, scard, sumtype, playerid) end
 
+function Card.IsSpecialSummonable(c) end
+function Card.IsSpell(c) end
+function Card.IsSpellTrap(c) end
+function Card.IsSSetable(c, ignore_field) end
+function Card.IsStatus(c, status) end
+function Card.IsSummonable(c, ignore_count, e, min) end
 function Card.IsSummonCode(c, sc, sumtype, playerid, ...) end
 
 ---Checks if the card type of "c" is "type" (if it is to be used as material for "scard" with Summon type "sumtype" by player "playerid").
@@ -473,6 +638,37 @@ function Duel.AddCustomActivityCounter(counter_id, activity_type, f) end
 
 ---Separates an effect for the purposes of timing (Reflects the effects of the conjunctives "then" and "also after that")
 function Duel.BreakEffect() end
+
+function Duel.CheckReleaseGroup(player, f, count, use_hand, max, check_field, card_to_check, to_player, zone, use_oppo, ex, ...) end
+function Duel.CheckReleaseGroupCost(player, f, minc, maxc, use_hand, spcheck, ex, ...) end
+function Duel.CheckReleaseGroupEx(player, f, count, use_hand, max, check_field, card_to_check, to_player, zone, use_oppo, ex, ...) end
+function Duel.CheckReleaseGroupSummon(c, player, e, fil, min, max, last, ...) end
+function Duel.CheckRemoveOverlayCard(player, s, o, count, reason) end
+function Duel.CheckSummonedCount(c) end
+function Duel.CheckTiming(timing) end
+function Duel.CheckTribute(c, min, max, mg, tp, zone) end
+function Duel.ClearOperationInfo(chainc) end
+function Duel.ClearTargetCard() end
+
+---Reveals the passed cards to the passed player if they are in a private knowledge state.
+---@param player Player
+---@param targets Card|Group
+function Duel.ConfirmCards(player, targets) end
+
+function Duel.ConfirmDecktop(player, count) end
+function Duel.ConfirmExtratop(tp, count) end
+function Duel.CountHeads(results, ...) end
+function Duel.CountTails(results, ...) end
+function Duel.CreateToken(player, code) end
+
+---Damages/Decreases player's (int player) Life Points by an amount (int value) for a reason (int reason). The damage is considered to be dealt by (int rp). Setting (bool is_step) to true will make so the damage is considered dealt at the call of Duel.RDComplete().
+---@param player Player
+---@param value integer
+---@param reason Reason
+---@param is_step boolean?
+---@param rp Player?
+---@return integer
+function Duel.Damage(player, value, reason, is_step, rp) end
 
 ---Destroys a card or group (Card|Group targets) with (int reason) as reason, and sends the card in the location specified by (int dest). If (int rp) is passed, sets the reason player to be that player. Returns the number of cards successfully destroyed.
 ---@param targets Card|Group
