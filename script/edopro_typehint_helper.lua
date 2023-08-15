@@ -479,7 +479,6 @@ function Card.IsCanTurnSet(c) end
 ---@return boolean
 function Card.IsCode(c, ...) end
 
-function Card.IsCode(c, ...) end
 function Card.IsContinuousSpell(c) end
 function Card.IsContinuousTrap(c) end
 
